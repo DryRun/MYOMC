@@ -22,14 +22,8 @@ if __name__ == "__main__":
 	parser.add_argument("--outcp", type=str, help="Transfer output files with cp")
 	args = parser.parse_args()
 
-	# Campaign mapping
-	if args.campaign == "RunIIFall18GS":
-		runscript = "run_Fall18GS.sh"
-		pileupfile = "pileup_RunIIFall18GS.dat"
-	elif args.campaign == "RunIIFall18GSBParking":
-		runscript = "run_Fall18GSBParking.sh"
-		pileupfile = "pileup_RunIIFall18GSBParking.dat"
-	else:
+	# Campaign check
+	if not args.campaign in ["RunIIFall18GS", "RunIIFall18GSBParking"]:
 		raise ValueError("Unknown campaign: {}".format(args.campaign))
 
 	# Check fragment exists
@@ -53,19 +47,17 @@ if __name__ == "__main__":
 	os.chdir(args.name)
 
 	# Submit to condor
-	with open("run.sh", 'w') as run_script:
+	with open("runwrapper.sh", 'w') as run_script:
 		run_script.write("#!/bin/bash\n")
 		run_script.write("ls -lrth\n")
 		run_script.write("pwd\n")
 		run_script.write("mkdir work\n")
 		run_script.write("cd work\n")
 		#run_script.write("env\n")
-		command = "source $_CONDOR_SCRATCH_DIR/{} {} $_CONDOR_SCRATCH_DIR/{} {} $1 filelist:$_CONDOR_SCRATCH_DIR/{} 2>&1 ".format(
-			runscript,
+		command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $1 filelist:$_CONDOR_SCRATCH_DIR/pileupinput.dat 2>&1 ".format(
 			args.name, 
 			os.path.basename(fragment_abspath), 
 			args.nevents_job,
-			os.path.basename(pileupfile)
 		)
 		run_script.write(command + "\n")
 		#run_script.write("source run_BParkingNANO.sh {} $NEVENTS ./*MiniAOD*root".format(args.bnano_cfg))
@@ -94,6 +86,27 @@ if __name__ == "__main__":
 				run_script.write("cp *RECO*root {} \n".format(args.outcp))
 			if args.keepGS:
 				run_script.write("cp *GS*root {} \n".format(args.outcp))
+		elif gfalcp:
+			if args.keepNano:
+				run_script.write("for FILENAME in *NanoAOD*root; do\n")
+				run_script.write("   gfal-copy -p -v -t 180 file://$FILENAME '{}'\n".format(args.gfalcp))
+				run_script.write("done\n")
+			if args.keepMini:
+				run_script.write("for FILENAME in *MiniAOD*root; do\n")
+				run_script.write("   gfal-copy -p -v -t 180 file://$FILENAME '{}'\n".format(args.gfalcp))
+				run_script.write("done\n")
+			if args.keepDR:
+				run_script.write("for FILENAME in *DR*root; do\n")
+				run_script.write("   gfal-copy -p -v -t 180 file://$FILENAME '{}'\n".format(args.gfalcp))
+				run_script.write("done\n")
+			if args.keepRECO:
+				run_script.write("for FILENAME in *RECO*root; do\n")
+				run_script.write("   gfal-copy -p -v -t 180 file://$FILENAME '{}'\n".format(args.gfalcp))
+				run_script.write("done\n")
+			if args.keepGS:
+				run_script.write("for FILENAME in *GS*root; do\n")
+				run_script.write("   gfal-copy -p -v -t 180 file://$FILENAME '{}'\n".format(args.gfalcp))
+				run_script.write("done\n")
 		else:
 			if args.keepNano:
 				run_script.write("mv *NanoAOD*root $_CONDOR_SCRATCH_DIR\n")
