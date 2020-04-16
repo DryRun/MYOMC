@@ -89,23 +89,23 @@ export HOME=/home/dryu
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 if [ -r CMSSW_10_2_5_DR/src ] ; then 
- echo release CMSSW_10_2_5_DR already exists
+    echo release CMSSW_10_2_5_DR already exists
+    cd CMSSW_10_2_5_DR/src
+    eval `scram runtime -sh`
 else
-scram project -n "CMSSW_10_2_5_DR" CMSSW_10_2_5
+    scram project -n "CMSSW_10_2_5_DR" CMSSW_10_2_5
+    cd CMSSW_10_2_5_DR/src
+    eval `scram runtime -sh`
+    # Hack configBuilder to be less dumb
+    git cms-addpkg Configuration/Applications
+    sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
+    sed -i "s/print(\"found/print(\"redacted\")#print(\"found files/g" Configuration/Applications/python/ConfigBuilder.py
+    sed -i "s/print \"found/print \"redacted\"#print \"found files/g" Configuration/Applications/python/ConfigBuilder.py
 fi
-cd CMSSW_10_2_5_DR/src
-eval `scram runtime -sh`
-# Hack configBuilder to be less dumb
-git cms-addpkg Configuration/Applications
-sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
-sed -i "s/print(\"found/print(\"redacted\")#print(\"found files/g" Configuration/Applications/python/ConfigBuilder.py
-sed -i "s/print \"found/print \"redacted\"#print \"found files/g" Configuration/Applications/python/ConfigBuilder.py
 #cat Configuration/Applications/python/ConfigBuilder.py
 scram b -j8
 cd ../../
 
-#echo "PILEUP_FILELIST:"
-#echo "$PILEUP_FILELIST"
 cmsDriver.py step1 \
 	--filein "file:RunIIFall18GENSIM_$NAME_$JOBINDEX.root" \
 	--fileout "file:RunIIFall18DRstep1_$NAME_$JOBINDEX.root" \
