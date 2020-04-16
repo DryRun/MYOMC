@@ -47,9 +47,9 @@ echo "Pileup filelist=$PILEUP_FILELIST"
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 if [ -r CMSSW_10_2_3_GS/src ] ; then 
- echo release CMSSW_10_2_3_GS already exists
+    echo release CMSSW_10_2_3_GS already exists
 else
-scram project -n "CMSSW_10_2_3_GS" CMSSW_10_2_3
+    scram project -n "CMSSW_10_2_3_GS" CMSSW_10_2_3
 fi
 cd CMSSW_10_2_3_GS/src
 eval `scram runtime -sh`
