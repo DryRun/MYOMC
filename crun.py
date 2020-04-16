@@ -32,6 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("--keepGS", action='store_true', help="Keep GS")
     parser.add_argument("--outEOS", type=str, help="Transfer files to EOS instead of back to AFS")
     parser.add_argument("--outcp", type=str, help="Transfer output files with cp")
+    parser.add_argument("--gfalcp", type=str, help="Transfer output files with gfalcp")
     args = parser.parse_args()
 
     # Campaign check
@@ -112,7 +113,7 @@ if __name__ == "__main__":
                 run_script.write("cp *RECO*root {} \n".format(args.outcp))
             if args.keepGS:
                 run_script.write("cp *GS*root {} \n".format(args.outcp))
-        elif gfalcp:
+        elif args.gfalcp:
             if args.keepNano:
                 run_script.write("for FILENAME in *NanoAOD*root; do\n")
                 run_script.write("   gfal-copy -p -v -t 180 file://$FILENAME '{}'\n".format(args.gfalcp))
