@@ -27,6 +27,5 @@ eval `scram runtime -sh`
 scram b
 cd ../../
 
-cd ..
-tar -czvf env.tar.gz env
+tar -czvf env.tar.gz ./CMSSW*
 
