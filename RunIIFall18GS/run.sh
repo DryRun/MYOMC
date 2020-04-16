@@ -85,14 +85,17 @@ cmsDriver.py Configuration/GenProduction/python/fragment.py \
 cmsRun "RunIIFall18GS_${NAME}_cfg.py"
 
 # DR
-export HOME=/home/dryu
+#export HOME=/home/dryu
 export SCRAM_ARCH=slc7_amd64_gcc700
-source /cvmfs/cms.cern.ch/cmsset_default.sh
+echo "DEBUG : Starting DR"
+echo $PWD
+ls -lrth .
 if [ -r CMSSW_10_2_5_DR/src ] ; then 
     echo release CMSSW_10_2_5_DR already exists
     cd CMSSW_10_2_5_DR/src
     eval `scram runtime -sh`
 else
+    echo "Checking out new DR release and editing"
     scram project -n "CMSSW_10_2_5_DR" CMSSW_10_2_5
     cd CMSSW_10_2_5_DR/src
     eval `scram runtime -sh`
