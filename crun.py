@@ -76,12 +76,15 @@ if __name__ == "__main__":
         if args.env:
             run_script.write("mv ../env.tar.gz .\n")
             run_script.write("tar -xzf env.tar.gz\n")
+            run_script.write("echo \"After untarring env:\"\n")
+            run_script.write("ls -lrth\n")
             run_script.write("for cdir in ./CMSSW*; do\n")
+            run_script.write("    echo $cdir\n")
             run_script.write("    cd $cdir/src\n")
             run_script.write("    scramv1 b ProjectRename\n")
             run_script.write("    scram b clean\n")
             run_script.write("    scram b -j8\n")
-            run_script.write("    cd ../..\n")
+            run_script.write("    cd $_CONDOR_SCRATCH_DIR/work\n")
             run_script.write("done\n")
         #run_script.write("env\n")
         command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $1 filelist:$_CONDOR_SCRATCH_DIR/pileupinput.dat 2>&1 ".format(
