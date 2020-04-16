@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("fragment", type=str, help="Path to fragment")
     parser.add_argument("campaign", type=str, help="Name of campaign")
     #parser.add_argument("bnano_cfg", type=str, help="Name of BParkingNano cfg")
-    parser.add_argument("--env", "-e", aciton="store_true", help="Use pre-packaged CMSSW environments (run setup_env.sh first)")
+    parser.add_argument("--env", "-e", action="store_true", help="Use pre-packaged CMSSW environments (run setup_env.sh first)")
     parser.add_argument("--nevents_job", type=int, default=100, help="Number of events per job")
     parser.add_argument("--njobs", type=int, default=1, help="Number jobs")
     parser.add_argument("--keepNano", action='store_true', help="Keep NanoAOD")
