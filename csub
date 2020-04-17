@@ -116,6 +116,7 @@ if args.x509:
 	top_script.write("export X509_USER_PROXY=$(readlink -e $_CONDOR_SCRATCH_DIR/{})\n".format(os.path.basename(x509_fullpath)))
 	top_script.write("echo $X509_USER_PROXY\n")
 	top_script.write("ls -lrth $X509_USER_PROXY\n")
+	top_script.write("voms-proxy-info -all\n")
 	files_to_transfer.append(x509_fullpath)
 top_script.write("source " + os.path.basename(args.script) + " $1\n")
 #top_script.write("source " + os.path.basename(args.script) + "\n")
