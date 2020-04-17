@@ -73,6 +73,7 @@ if __name__ == "__main__":
         run_script.write("pwd\n")
         run_script.write("mkdir work\n")
         run_script.write("cd work\n")
+        run_script.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
         if args.env:
             run_script.write("mv ../env.tar.gz .\n")
             run_script.write("tar -xzf env.tar.gz\n")
