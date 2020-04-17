@@ -163,7 +163,7 @@ if __name__ == "__main__":
                         ]
     if args.env:
         files_to_transfer.append("{}/{}/env.tar.gz".format(MYOMCPATH, args.campaign))
-    csub_command = "csub runwrapper.sh -t tomorrow --mem 4000 -F {} --queue_n {} -x $HOME/private/x509up".format(",".join(files_to_transfer), args.njobs) # 
+    csub_command = "csub runwrapper.sh -t tomorrow --mem 15900 -F {} --queue_n {} -x $HOME/private/x509up".format(",".join(files_to_transfer), args.njobs) # 
     os.system(csub_command)
 
     os.chdir(cwd)
