@@ -83,6 +83,10 @@ cmsDriver.py Configuration/GenProduction/python/fragment.py \
 	--customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\nprocess.RandomNumberGeneratorService.generator.initialSeed=${RSEED}" \
 	-n $NEVENTS
 cmsRun "RunIIFall18GS_${NAME}_cfg.py"
+if [ ! -f "RunIIFall18GENSIM_$NAME_$JOBINDEX.root" ]; then
+	echo "RunIIFall18GENSIM_$NAME_$JOBINDEX.root not found. Exiting."
+	return 1
+fi
 
 # DR
 #export HOME=/home/dryu
@@ -131,6 +135,10 @@ cmsDriver.py step1 \
 #    --pileup_dasoption "-dasmaps=. --limit=50" \
 #	--customise_commands "import cPickle as pickle\\nprocess.mixData.input.fileNames = cms.untracked.vstring(*pickle.load(open($PILEUP_PICKLE,\"rb\")))"
 cmsRun "RunIIFall18DRstep1_${NAME}_cfg.py"
+if [ ! -f "RunIIFall18DRstep1_$NAME_$JOBINDEX.root" ]; then
+	echo "RunIIFall18DRstep1_$NAME_$JOBINDEX.root not found. Exiting."
+	return 1
+fi
 
 cmsDriver.py step2 \
 	--filein "file:RunIIFall18DRstep1_$NAME_$JOBINDEX.root" \
@@ -149,6 +157,10 @@ cmsDriver.py step2 \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	-n $NEVENTS
 cmsRun "RunIIFall18DRstep2_${NAME}_cfg.py"
+if [ ! -f "RunIIFall18DRstep2_$NAME_$JOBINDEX.root" ]; then
+	echo "RunIIFall18DRstep2_$NAME_$JOBINDEX.root not found. Exiting."
+	return 1
+fi
 
 
 # MiniAOD
@@ -171,6 +183,10 @@ cmsDriver.py step1 \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	-n $NEVENTS
 cmsRun "RunIIFall18MiniAOD_${NAME}_cfg.py"
+if [ ! -f "RunIIFall18MiniAOD_$NAME_$JOBINDEX.root" ]; then
+	echo "RunIIFall18MiniAOD_$NAME_$JOBINDEX.root not found. Exiting."
+	return 1
+fi
 
 
 # NanoAOD
