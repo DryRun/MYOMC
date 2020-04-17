@@ -142,7 +142,7 @@ if __name__ == "__main__":
                 run_script.write("   gfal-copy -p -v -t 180 file://$PWD/$FILENAME '{}'\n".format(args.gfalcp))
                 run_script.write("done\n")
             if args.keepGS:
-                run_script.write("for FILENAME in *GS*root; do\n")
+                run_script.write("for FILENAME in *GENSIM*root; do\n")
                 run_script.write("   gfal-copy -p -v -t 180 file://$PWD/$FILENAME '{}'\n".format(args.gfalcp))
                 run_script.write("done\n")
         else:
