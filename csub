@@ -144,7 +144,7 @@ submission_file.write("should_transfer_files = yes\n")
 submission_file.write("transfer_input_files=" + ",".join(files_to_transfer) + "\n")
 submission_file.write("when_to_transfer_output = on_exit\n")
 submission_file.write("notification = Always\n")
-submission_file.write9"notify_user = david_yu@brown.edu\n")
+submission_file.write("notify_user = david_yu@brown.edu\n")
 if args.os:
 	submission_file.write("requirements = (OpSysAndVer =?= \"{}\")\n".format(args.os))
 submission_file.write("+JobFlavour = \"{}\"\n".format(args.time_limit))
