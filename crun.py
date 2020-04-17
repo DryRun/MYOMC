@@ -121,6 +121,10 @@ if __name__ == "__main__":
             if args.keepGS:
                 run_script.write("cp *GS*root {} \n".format(args.outcp))
         elif args.gfalcp:
+            run_script.write("echo \"Starting gfal-cp from $PWD\n\"")
+            run_script.write("echo \"Contents of current directory:\n\"")
+            run_script.write("ls -lrth \n")
+
             if args.keepNano:
                 run_script.write("for FILENAME in *NanoAOD*root; do\n")
                 run_script.write("   gfal-copy -p -v -t 180 file://$PWD/$FILENAME '{}'\n".format(args.gfalcp))
