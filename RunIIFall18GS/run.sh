@@ -90,14 +90,14 @@ export SCRAM_ARCH=slc7_amd64_gcc700
 echo "DEBUG : Starting DR"
 echo $PWD
 ls -lrth .
-if [ -r CMSSW_10_2_5_DR/src ] ; then 
-    echo release CMSSW_10_2_5_DR already exists
-    cd CMSSW_10_2_5_DR/src
+if [ -r CMSSW_10_2_5_DRMiniAOD ] ; then 
+    echo release CMSSW_10_2_5_DRMiniAOD already exists
+    cd CMSSW_10_2_5_DRMiniAOD/src
     eval `scram runtime -sh`
 else
     echo "Checking out new DR release and editing"
-    scram project -n "CMSSW_10_2_5_DR" CMSSW_10_2_5
-    cd CMSSW_10_2_5_DR/src
+    scram project -n "CMSSW_10_2_5_DRMiniAOD" CMSSW_10_2_5
+    cd CMSSW_10_2_5_DRMiniAOD/src
     eval `scram runtime -sh`
     # Hack configBuilder to be less dumb
     git cms-addpkg Configuration/Applications
