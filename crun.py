@@ -124,7 +124,7 @@ if __name__ == "__main__":
             run_script.write("echo \"Starting gfal-cp from $PWD\n\"")
             run_script.write("echo \"Contents of current directory:\n\"")
             run_script.write("ls -lrth \n")
-
+            run_script.write("scram unsetenv\n")
             if args.keepNano:
                 run_script.write("for FILENAME in ./*NanoAOD*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
