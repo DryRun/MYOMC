@@ -128,27 +128,27 @@ if __name__ == "__main__":
             if args.keepNano:
                 run_script.write("for FILENAME in ./*NanoAOD*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
-                run_script.write("   gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\n".format(args.gfalcp))
+                run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
             if args.keepMini:
                 run_script.write("for FILENAME in ./*MiniAOD*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
-                run_script.write("   gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\n".format(args.gfalcp))
+                run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
             if args.keepDR:
                 run_script.write("for FILENAME in ./*DR*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
-                run_script.write("   gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\n".format(args.gfalcp))
+                run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
             if args.keepRECO:
                 run_script.write("for FILENAME in ./*RECO*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
-                run_script.write("   gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\n".format(args.gfalcp))
+                run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
             if args.keepGS:
                 run_script.write("for FILENAME in ./*GENSIM*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
-                run_script.write("   gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\n".format(args.gfalcp))
+                run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
         else:
             if args.keepNano:
