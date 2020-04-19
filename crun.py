@@ -14,7 +14,7 @@ def make_proxy(proxy_path):
 def get_proxy_lifetime(proxy_path):
     import subprocess
     lifetime = float(subprocess.check_output("voms-proxy-info -timeleft -file ~/private/x509up", shell=True).strip())
-    print("Proxy remaining lifetime: {}".formate(lifetime))
+    print("Proxy remaining lifetime: {}".format(lifetime))
     return lifetime
 
 if __name__ == "__main__":
