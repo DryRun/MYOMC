@@ -1,6 +1,8 @@
 #Run private production using RunIIFall18GS settings.
 echo $@
 
+ts_start=start=`date +%s`
+
 if [ -z "$1" ]; then
     echo "Argument 1 (name of job) is mandatory."
     exit 1
@@ -82,6 +84,8 @@ cmsDriver.py Configuration/GenProduction/python/fragment.py \
     --customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\nprocess.RandomNumberGeneratorService.generator.initialSeed=${RSEED}" \
     -n $NEVENTS
 cmsRun "RunIIFall18GS_${NAME}_cfg.py"
+ts_gs=start=`date +%s`
+echo "TIME: GS = $((ts_gs-ts_start))"
 if [ ! -f "RunIIFall18GENSIM_$NAME_$JOBINDEX.root" ]; then
     echo "RunIIFall18GENSIM_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
@@ -127,6 +131,8 @@ cmsDriver.py step1 \
 #   --pileup_input "dbs:/MinBias_TuneCP5_13TeV-pythia8/RunIIFall18GS-102X_upgrade2018_realistic_v9-v1/GEN-SIM" \
 #    --pileup_dasoption "-dasmaps=. --limit=50" \
 cmsRun "RunIIFall18DRstep1_${NAME}_cfg.py"
+ts_dr1=`date +%s`
+echo "TIME: DR1 = $((ts_dr1-ts_gs))"
 if [ ! -f "RunIIFall18DRstep1_$NAME_$JOBINDEX.root" ]; then
     echo "RunIIFall18DRstep1_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
@@ -176,6 +182,8 @@ cmsDriver.py step1 \
     --no_exec \
     --customise Configuration/DataProcessing/Utils.addMonitoring -n $NEVENTS
 cmsRun "RunIIFall18RECOBParking_${NAME}_cfg.py"
+ts_reco=`date +%s`
+echo "TIME: RECO = $((ts_reco-ts_dr1))"
 if [ ! -f "RunIIFall18RECOBParking_$NAME_$JOBINDEX.root" ]; then
     echo "RunIIFall18RECOBParking_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
@@ -207,6 +215,8 @@ cmsDriver.py step1 \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     -n $NEVENTS
 cmsRun "RunIIFall18MiniAOD_${NAME}_cfg.py"
+ts_mini=`date +%s`
+echo "TIME: MiniAOD = $((ts_mini-ts_reco))"
 if [ ! -f "RunIIFall18MiniAOD_$NAME_$JOBINDEX.root" ]; then
     echo "RunIIFall18MiniAOD_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
@@ -240,3 +250,6 @@ fi
 #   --customise Configuration/DataProcessing/Utils.addMonitoring \
 #   -n $NEVENTS
 #cmsRun "RunIIFall18NanoAOD_${NAME}_cfg.py"
+
+ts_end=`date +%s`
+echo "TIME: Total = $((ts_end-ts_start))"
