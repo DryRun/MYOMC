@@ -33,7 +33,7 @@ parser.add_argument("--x509", "-x", type=str, default=None, help="Path to x509 p
 args = parser.parse_args()
 
 #scripts = [os.path.realpath(x) for x in args.scripts.split(",")]
-if arg.os:
+if args.os:
 	if not args.os in ["SLCern6", "CentOS7"]:
 		raise ValueError("--os must be SLCern6 or CentOS7")
 
