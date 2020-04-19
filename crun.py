@@ -187,15 +187,15 @@ if __name__ == "__main__":
     if not args.os:
         # Infer OS from campaign
         if "RunII" in args.campaign:
-            os = "SLCern6"
+            job_os = "SLCern6"
         elif "UL" in args.campaign:
-            os = "CentOS7"
+            job_os = "CentOS7"
         else:
             print "Unable to infer OS from campaign {}. Using CC7.".format(args.campaign)
-            os = "CentOS7"
+            job_os = "CentOS7"
     else:
-        os = args.os
-    csub_command += " --os {}".format(os)
+        job_os = args.os
+    csub_command += " --os {}".format(job_os)
     os.system(csub_command)
 
     os.chdir(cwd)
