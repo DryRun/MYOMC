@@ -34,3 +34,6 @@ scram b
 cd ../../
 
 tar -czvf env.tar.gz ./CMSSW*
+mv env.tar.gz ..
+cd ..
+rm -rf env

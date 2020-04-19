@@ -13,7 +13,9 @@ def make_proxy(proxy_path):
 
 def get_proxy_lifetime(proxy_path):
     import subprocess
-    return float(subprocess.check_output("voms-proxy-info -timeleft -file ~/private/x509up", shell=True).strip())
+    lifetime = float(subprocess.check_output("voms-proxy-info -timeleft -file ~/private/x509up", shell=True).strip())
+    print("Proxy remaining lifetime: {}".formate(lifetime))
+    return lifetime
 
 if __name__ == "__main__":
     import argparse
@@ -51,6 +53,9 @@ if __name__ == "__main__":
         make_proxy(proxy_path)
     elif get_proxy_lifetime(proxy_path) < 24: # Require proxy with >24h left
         make_proxy(proxy_path)
+    else:
+        print("Using existing x509 proxy:")
+        os.system("voms-proxy-info")
 
     # For args.outEOS, make sure it's formatted correctly
     if args.outEOS:
