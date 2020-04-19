@@ -3,8 +3,8 @@ mkdir env
 cd env
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-scram project -n "CMSSW_10_2_15_patch1_GS" CMSSW_10_2_15_patch1
-cd CMSSW_10_2_15_patch1_GS/src
+scram project -n "CMSSW_10_2_20_GS" CMSSW_10_2_20
+cd CMSSW_10_2_20_GS/src
 eval `scram runtime -sh`
 scram b
 cd ../..
