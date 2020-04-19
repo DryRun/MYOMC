@@ -35,6 +35,7 @@ if __name__ == "__main__":
     parser.add_argument("--outEOS", type=str, help="Transfer files to EOS instead of back to AFS")
     parser.add_argument("--outcp", type=str, help="Transfer output files with cp")
     parser.add_argument("--gfalcp", type=str, help="Transfer output files with gfalcp")
+    parser.add_argument("--os", type=str, help="Force SLC7 or CC7 (might not work!)")
     args = parser.parse_args()
 
     # Campaign check
@@ -56,6 +57,11 @@ if __name__ == "__main__":
     else:
         print("Using existing x509 proxy:")
         os.system("voms-proxy-info")
+
+    # Check OS
+    if args.os:
+        if not args.os in ["SLCern6", "CentOS7"]:
+            raise ValueError("--os must be SLCern6 or CentOS7.")
 
     # For args.outEOS, make sure it's formatted correctly
     if args.outEOS:
@@ -178,6 +184,18 @@ if __name__ == "__main__":
     if args.env:
         files_to_transfer.append("{}/{}/env.tar.gz".format(MYOMCPATH, args.campaign))
     csub_command = "csub runwrapper.sh -t tomorrow --mem 15900 -F {} --queue_n {} -x $HOME/private/x509up".format(",".join(files_to_transfer), args.njobs) # 
+    if not args.os:
+        # Infer OS from campaign
+        if "RunII" in args.campaign:
+            os = "SLCern6"
+        elif "UL" in args.campaign:
+            os = "CentOS7"
+        else:
+            print "Unable to infer OS from campaign {}. Using CC7.".format(args.campaign)
+            os = "CentOS7"
+    else:
+        os = args.os
+    csub_command += " --os {}".format(os)
     os.system(csub_command)
 
     os.chdir(cwd)

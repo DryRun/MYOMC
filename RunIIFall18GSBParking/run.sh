@@ -46,7 +46,7 @@ echo "Pileup filelist=$PILEUP_FILELIST"
 
 
 # GENSIM
-export SCRAM_ARCH=slc7_amd64_gcc700
+export SCRAM_ARCH=slc6_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 if [ -r CMSSW_10_2_22_GS/src ] ; then 
     echo release CMSSW_10_2_22_GS already exists
@@ -92,7 +92,7 @@ if [ ! -f "RunIIFall18GENSIM_$NAME_$JOBINDEX.root" ]; then
 fi
 
 # DR
-export SCRAM_ARCH=slc7_amd64_gcc700
+export SCRAM_ARCH=slc6_amd64_gcc700
 if [ -r CMSSW_10_2_13_DR/src ] ; then 
     echo release CMSSW_10_2_13_DR already exists
     cd CMSSW_10_2_13_DR/src
@@ -158,7 +158,7 @@ fi
 
 
 # RECOBParking
-export SCRAM_ARCH=slc7_amd64_gcc700
+export SCRAM_ARCH=slc6_amd64_gcc700
 if [ -r CMSSW_10_2_14_RECOBParking/src ] ; then 
  echo release CMSSW_10_2_14_RECOBParking already exists
 else
@@ -223,7 +223,7 @@ if [ ! -f "RunIIFall18MiniAOD_$NAME_$JOBINDEX.root" ]; then
 fi
 
 # NanoAOD
-#export SCRAM_ARCH=slc7_amd64_gcc700
+#export SCRAM_ARCH=slc6_amd64_gcc700
 #source /cvmfs/cms.cern.ch/cmsset_default.sh
 #if [ -r CMSSW_10_2_18_NanoAOD/src ] ; then 
 # echo release CMSSW_10_2_18_NanoAOD already exists

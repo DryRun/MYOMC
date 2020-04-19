@@ -33,6 +33,9 @@ parser.add_argument("--x509", "-x", type=str, default=None, help="Path to x509 p
 args = parser.parse_args()
 
 #scripts = [os.path.realpath(x) for x in args.scripts.split(",")]
+if arg.os:
+	if not args.os in ["SLCern6", "CentOS7"]:
+		raise ValueError("--os must be SLCern6 or CentOS7")
 
 starting_directory = os.getcwd()
 if args.working_directory:
@@ -146,7 +149,16 @@ submission_file.write("when_to_transfer_output = on_exit\n")
 #submission_file.write("notification = Always\n")
 #submission_file.write("notify_user = email@ddr.es\n")
 if args.os:
-	submission_file.write("requirements = (OpSysAndVer =?= \"{}\")\n".format(args.os))
+	# Try to get hostname
+	import socket
+	hostname = socket.gethostname()
+	if "cmslpc" in hostname:
+		if args.os == "SLCern6":
+			submission_file.write("+DesiredOS=\"SL6\"\n")
+		elif args.os == "CentOS7":
+			submission_file.write("+DesiredOS=\"SL7\"\n")
+	else:
+		submission_file.write("requirements = (OpSysAndVer =?= \"{}\")\n".format(args.os))
 submission_file.write("+JobFlavour = \"{}\"\n".format(args.time_limit))
 if args.transfer_output:
 	submission_file.write("transfer_output_files = " + args.transfer_output + "\n")

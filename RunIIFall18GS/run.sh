@@ -44,7 +44,7 @@ echo "Pileup filelist=$PILEUP_FILELIST"
 
 
 # GENSIM
-export SCRAM_ARCH=slc7_amd64_gcc700
+export SCRAM_ARCH=slc6_amd64_gcc700 #slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 if [ -r CMSSW_10_2_3_GS/src ] ; then 
     echo release CMSSW_10_2_3_GS already exists
@@ -90,7 +90,7 @@ fi
 
 # DR
 #export HOME=/home/dryu
-export SCRAM_ARCH=slc7_amd64_gcc700
+export SCRAM_ARCH=slc6_amd64_gcc700
 echo "DEBUG : Starting DR"
 echo $PWD
 ls -lrth .
@@ -190,7 +190,7 @@ fi
 
 
 # NanoAOD
-#export SCRAM_ARCH=slc7_amd64_gcc700
+#export SCRAM_ARCH=slc6_amd64_gcc700
 #source /cvmfs/cms.cern.ch/cmsset_default.sh
 #if [ -r CMSSW_10_2_18_NanoAOD/src ] ; then 
 # echo release CMSSW_10_2_18_NanoAOD already exists
