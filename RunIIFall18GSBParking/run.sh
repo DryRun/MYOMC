@@ -46,12 +46,12 @@ echo "Pileup filelist=$PILEUP_FILELIST"
 # GENSIM
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_10_2_20_GS/src ] ; then 
-    echo release CMSSW_10_2_20_GS already exists
+if [ -r CMSSW_10_2_22_GS/src ] ; then 
+    echo release CMSSW_10_2_22_GS already exists
 else
-    scram project -n "CMSSW_10_2_20_GS" CMSSW_10_2_20
+    scram project -n "CMSSW_10_2_22_GS" CMSSW_10_2_22
 fi
-cd CMSSW_10_2_20_GS/src
+cd CMSSW_10_2_22_GS/src
 eval `scram runtime -sh`
 
 mkdir -pv $CMSSW_BASE/src/Configuration/GenProduction/python
