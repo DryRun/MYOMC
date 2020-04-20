@@ -25,6 +25,7 @@ parser.add_argument('-o', '--transfer_output', type=str, help="Specify specific 
 parser.add_argument('-t', '--time_limit', type=str, default="longlunch", help="JobFlavour option (espresso=20min, microcentury=1hr, longlunch=2hr, workday=8hr, tomorrow=1day, testmatch=3day, nextweek=1week")
 parser.add_argument('-p', '--pythonpath', action='store_true', help="Use the current PYTHONPATH")
 parser.add_argument('-O', '--os', type=str, default=None, help="Specify OS: SLCern6 or CentOS7")
+parser.add_argument('-c', '--nCores', type=int, default=1, help="Request multiple cores")
 parser.add_argument('--no_submit', action='store_true', help="Prepare jobs but don't submit")
 #parser.add_argument('--cmssw', action='store_true', help='Transfer CMSSW libraries as a tarball')
 #parser.add_argument('--cmssw_src', action='store_true', help='Transfer CMSSW src as a tarball, and compile on worker node')
@@ -159,7 +160,9 @@ if args.os:
 			submission_file.write("+DesiredOS=\"SL7\"\n")
 	else:
 		submission_file.write("requirements = (OpSysAndVer =?= \"{}\")\n".format(args.os))
-submission_file.write("+JobFlavour = \"{}\"\n".format(args.time_limit))
+if args.nCores:
+	submission_file.write("request_cpus = {}\n".format(args.nCores))
+Coressubmission_file.write("+JobFlavour = \"{}\"\n".format(args.time_limit))
 if args.transfer_output:
 	submission_file.write("transfer_output_files = " + args.transfer_output + "\n")
 if args.log:

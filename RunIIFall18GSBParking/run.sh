@@ -75,7 +75,7 @@ cmsDriver.py Configuration/GenProduction/python/fragment.py \
     --conditions 102X_upgrade2018_realistic_v11 \
     --beamspot Realistic25ns13TeVEarly2018Collision \
     --step GEN,SIM \
-    --nThreads 4 \
+    --nThreads 8 \
     --geometry DB:Extended \
     --era Run2_2018 \
     --python_filename "RunIIFall18GS_${NAME}_cfg.py" \
