@@ -162,7 +162,7 @@ if args.os:
 		submission_file.write("requirements = (OpSysAndVer =?= \"{}\")\n".format(args.os))
 if args.nCores:
 	submission_file.write("request_cpus = {}\n".format(args.nCores))
-Coressubmission_file.write("+JobFlavour = \"{}\"\n".format(args.time_limit))
+submission_file.write("+JobFlavour = \"{}\"\n".format(args.time_limit))
 if args.transfer_output:
 	submission_file.write("transfer_output_files = " + args.transfer_output + "\n")
 if args.log:
