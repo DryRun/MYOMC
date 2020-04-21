@@ -1,5 +1,23 @@
-#Run private production using RunIIFall18GS settings.
+# Run private production using RunIIFall18GS settings.
+# Local example:
+# source run.sh MyMCName /path/to/fragment.py 1000 1 filelist:/path/to/pileup/list.txt
+# 
+# Batch example:
+# python crun.py MyMCName /path/to/fragment.py --outEOS /store/user/myname/somefolder --keepMini --nevents_job 10000 --njobs 100 --env
+# See crun.py for full options, especially regarding transfer of outputs.
+# Make sure your gridpack is somewhere readable, e.g. EOS or CVMFS.
+# Make sure to run setup_env.sh first to create a CMSSW tarball (have to patch the DR step to avoid taking forever to uniqify the list of 300K pileup files)
 echo $@
+
+crun.py BdToKstarJpsi_ToKPiMuMu_probefilter \
+    /uscms/home/dryu/BFrag/gen/BdToKstarJpsi_ToKPiMuMu_probefilter/fragment.py \
+    RunIIFall18GSBParking \
+    --gfalcp "gsiftp://brux11.hep.brown.edu/mnt/hadoop/store/user/dryu/BParkingMC/BdToKstarJpsi_ToKPiMuMu_probefilter/" \
+    --keepMini \
+    --nevents_job 75000 \
+    --njobs 1000 \
+    --env
+
 
 if [ -z "$1" ]; then
 	echo "Argument 1 (name of job) is mandatory."
