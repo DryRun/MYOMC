@@ -3,8 +3,6 @@ export SYSTEM_RELEASE=`cat /etc/redhat-release`
 if { [[ $SYSTEM_RELEASE == *"release 7"* ]]; }; then
   echo "Running setup_env.sh on SLC6."
   if { [[ $(hostname -s) = lxplus* ]]; }; then
-  	echo "DEBUG: PWD = "
-  	echo "$PWD"
   	ssh -Y lxplus6 "cd $PWD; source setup_env.sh;"
   elif { [[ $(hostname -s) = cmslpc* ]]; }; then
   	ssh -Y cmslpc-sl6 "cd $PWD; source setup_env.sh;"
