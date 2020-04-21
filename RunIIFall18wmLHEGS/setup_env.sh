@@ -1,11 +1,11 @@
 #!/bin/bash
 export SYSTEM_RELEASE=`cat /etc/redhat-release`
 if { [[ $SYSTEM_RELEASE == *"release 7"* ]]; }; then
-  echo "Running this script in SLC6."
+  echo "Running setup_env.sh on SLC6."
   if { [[ $(hostname -s) = lxplus* ]]; }; then
-  	ssh lxplus6 -f "cd $PWD; source setup_env.sh;"
+  	ssh -Y lxplus6 -f "cd $PWD; source setup_env.sh;"
   elif { [[ $(hostname -s) = cmslpc* ]]; }; then
-  	ssh cmslpc-sl6 -f "cd $PWD; source setup_env.sh;"
+  	ssh -Y cmslpc-sl6 -f "cd $PWD; source setup_env.sh;"
   else
   	echo "Not on cmslpc or lxplus, not sure what to do."
   	return 1
