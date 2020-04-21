@@ -15,6 +15,7 @@ eval `scram runtime -sh`
 # Hack configBuilder to be less dumb
 # Hack configBuilder to be less dumb
 git cms-addpkg Configuration/Applications
+git cms-merge-topic kpedro88:filesFromList_102X
 sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
 sed -i "s/print(\"found/print(\"redacted\")#print(\"found files/g" Configuration/Applications/python/ConfigBuilder.py
 sed -i "s/print \"found/print \"redacted\"#print \"found files/g" Configuration/Applications/python/ConfigBuilder.py
@@ -36,4 +37,3 @@ cd ../../
 tar -czvf env.tar.gz ./CMSSW*
 mv env.tar.gz ..
 cd ..
-rm -rf env

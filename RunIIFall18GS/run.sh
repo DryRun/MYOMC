@@ -30,7 +30,7 @@ fi
 RSEED=$((JOBINDEX + 1001))
 
 if [ -z "$5" ]; then
-	PILEUP_FILELIST="filelist:/home/dryu/BFrag/gen/scripts/pileup_RunIIFall18GS.dat"
+    PILEUP_FILELIST="filelist:$MYOMCPATH/RunIIFall18GS/pileupinput.dat"
 else
 	PILEUP_FILELIST=$5
 fi
@@ -105,6 +105,7 @@ else
     eval `scram runtime -sh`
     # Hack configBuilder to be less dumb
     git cms-addpkg Configuration/Applications
+	git cms-merge-topic kpedro88:filesFromList_102X
     sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
     sed -i "s/print(\"found/print(\"redacted\")#print(\"found files/g" Configuration/Applications/python/ConfigBuilder.py
     sed -i "s/print \"found/print \"redacted\"#print \"found files/g" Configuration/Applications/python/ConfigBuilder.py

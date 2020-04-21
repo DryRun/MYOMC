@@ -9,16 +9,6 @@
 # Make sure to run setup_env.sh first to create a CMSSW tarball (have to patch the DR step to avoid taking forever to uniqify the list of 300K pileup files)
 echo $@
 
-crun.py BdToKstarJpsi_ToKPiMuMu_probefilter \
-    /uscms/home/dryu/BFrag/gen/BdToKstarJpsi_ToKPiMuMu_probefilter/fragment.py \
-    RunIIFall18GSBParking \
-    --gfalcp "gsiftp://brux11.hep.brown.edu/mnt/hadoop/store/user/dryu/BParkingMC/BdToKstarJpsi_ToKPiMuMu_probefilter/" \
-    --keepMini \
-    --nevents_job 75000 \
-    --njobs 1000 \
-    --env
-
-
 if [ -z "$1" ]; then
 	echo "Argument 1 (name of job) is mandatory."
 	exit 1
@@ -124,7 +114,8 @@ else
     eval `scram runtime -sh`
     # Hack configBuilder to be less dumb
     git cms-addpkg Configuration/Applications
-    sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
+    git cms-merge-topic kpedro88:filesFromList_102X
+    #sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
     sed -i "s/print(\"found/print(\"redacted\")#print(\"found files/g" Configuration/Applications/python/ConfigBuilder.py
     sed -i "s/print \"found/print \"redacted\"#print \"found files/g" Configuration/Applications/python/ConfigBuilder.py
 fi
