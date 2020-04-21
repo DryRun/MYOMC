@@ -98,6 +98,10 @@ if [ -r CMSSW_10_2_5_DRMiniAOD ] ; then
     echo release CMSSW_10_2_5_DRMiniAOD already exists
     cd CMSSW_10_2_5_DRMiniAOD/src
     eval `scram runtime -sh`
+elif [ -r $MYOMC/CMSSW_10_2_5_DRMiniAOD ] ; then 
+    echo release CMSSW_10_2_5_DRMiniAOD already exists
+    cd CMSSW_10_2_5_DRMiniAOD/src
+    eval `scram runtime -sh`    
 else
     echo "Checking out new DR release and editing"
     scram project -n "CMSSW_10_2_5_DRMiniAOD" CMSSW_10_2_5

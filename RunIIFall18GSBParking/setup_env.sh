@@ -1,4 +1,17 @@
 #!/bin/bash
+export SYSTEM_RELEASE=`cat /etc/redhat-release`
+if { [[ $SYSTEM_RELEASE == *"release 7"* ]] }; then
+  echo "Running this script in SLC6."
+  if { [[ $(hostname -s) = lxplus* ]]}; then
+  	ssh lxplus6 -c "cd $PWD; source setup_env.sh;"
+  elif { [[ $(hostname -s) = cmslpc* ]] }; then
+  	ssh cmslpc-sl6 -c "cd $PWD; source setup_env.sh;"
+  else
+  	echo "Not on cmslpc or lxplus, not sure what to do."
+  	return 1
+  fi
+fi
+
 mkdir env
 cd env
 export SCRAM_ARCH=slc6_amd64_gcc700
