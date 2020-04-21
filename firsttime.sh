@@ -6,3 +6,4 @@ for CAMPAIGN in "${CAMPAIGNS[@]}"; do
 	cd $CAMPAIGN
 	source setup_env.sh
 	cd $TOPDIR
+done
