@@ -36,6 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--outcp", type=str, help="Transfer output files with cp")
     parser.add_argument("--gfalcp", type=str, help="Transfer output files with gfalcp")
     parser.add_argument("--os", type=str, help="Force SLC7 or CC7 (might not work!)")
+    parser.add_argument("--seed_offset", type=int, default=0, help="Offset random seed (useful for extending previous runs)")
     args = parser.parse_args()
 
     # Campaign check
@@ -99,10 +100,11 @@ if __name__ == "__main__":
             run_script.write("    cd $_CONDOR_SCRATCH_DIR/work\n")
             run_script.write("done\n")
         #run_script.write("env\n")
-        command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $1 filelist:$_CONDOR_SCRATCH_DIR/pileupinput.dat 2>&1 ".format(
+        command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $(($1+{})) filelist:$_CONDOR_SCRATCH_DIR/pileupinput.dat 2>&1 ".format(
             args.name, 
             os.path.basename(fragment_abspath), 
             args.nevents_job,
+            args.seed_offset
         )
         run_script.write(command + "\n")
         #run_script.write("source run_BParkingNANO.sh {} $NEVENTS ./*MiniAOD*root".format(args.bnano_cfg))
@@ -196,6 +198,8 @@ if __name__ == "__main__":
     else:
         job_os = args.os
     csub_command += " --os {}".format(job_os)
+    if args.seed_offset:
+        csub_command += " --seed_offset {}".format(args.seed_offset)
     os.system(csub_command)
 
     os.chdir(cwd)
