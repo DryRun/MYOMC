@@ -10,6 +10,7 @@ if { [[ $SYSTEM_RELEASE == *"release 7"* ]]; }; then
   	echo "Not on cmslpc or lxplus, not sure what to do."
   	return 1
   fi
+  return 1
 fi
 
 mkdir env
