@@ -100,7 +100,7 @@ if [ -r CMSSW_10_2_13_DR/src ] ; then
     echo release CMSSW_10_2_13_DR already exists
     cd CMSSW_10_2_13_DR/src
     eval `scram runtime -sh`
-elif [ -z $MYOMC ] && [ -r $MYOMC/CMSSW_10_2_13_DR ]; then 
+elif [ -z $MYOMC ] && [ -r $MYOMC/RunIIFall18GSBParking/env/CMSSW_10_2_13_DR ]; then 
     echo Using precompiled release at $MYOMC/CMSSW_10_2_13_DR
     cd $MYOMC/CMSSW_10_2_13_DR/src
     eval `scram runtime -sh`    
@@ -171,7 +171,7 @@ if [ -r CMSSW_10_2_14_RECOBParking/src ] ; then
     echo "release CMSSW_10_2_14_RECOBParking already exists"
     cd CMSSW_10_2_14_RECOBParking/src
     eval `scram runtime -sh`
-elif [ -z $MYOMC ] && [ -r $MYOMC/CMSSW_10_2_14_RECOBParking ]; then 
+elif [ -z $MYOMC ] && [ -r $MYOMC/RunIIFall18GSBParking/env/CMSSW_10_2_14_RECOBParking ]; then 
     echo "Using precompiled release at $MYOMC/CMSSW_10_2_14_RECOBParking"
     cd $MYOMC/CMSSW_10_2_14_RECOBParking/src
     eval `scram runtime -sh`    

@@ -110,7 +110,7 @@ if [ -r CMSSW_10_2_5_DRMiniAOD ] ; then
     echo release CMSSW_10_2_5_DRMiniAOD already exists
     cd CMSSW_10_2_5_DRMiniAOD/src
     eval `scram runtime -sh`
-elif [ -z $MYOMC ] && [ -r $MYOMC/CMSSW_10_2_5_DRMiniAOD ]; then 
+elif [ -z $MYOMC ] && [ -r $MYOMC/RunIIFall18wmLHEGS/env/CMSSW_10_2_5_DRMiniAOD ]; then 
     echo "Using precompiled release at $MYOMC/CMSSW_10_2_5_DRMiniAOD"
     cd $MYOMC/CMSSW_10_2_5_DRMiniAOD/src
     eval `scram runtime -sh`    
