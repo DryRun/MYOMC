@@ -29,7 +29,7 @@ cd CMSSW_10_2_5_DRMiniAOD/src
 eval `scram runtime -sh`
 # Hack configBuilder to be less dumb
 git cms-addpkg Configuration/Applications
-git cms-merge-topic kpedro88:filesFromList_102X
+git cherry-pick 6c56c41899274246b2c9ba777f12ba9c1155acd6^..ca45cfac90f87030695fea8b328f08bb5c4c6998
 sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
 sed -i "s/print(\"found/print(\"redacted\")#print(\"found files/g" Configuration/Applications/python/ConfigBuilder.py
 sed -i "s/print \"found/print \"redacted\"#print \"found files/g" Configuration/Applications/python/ConfigBuilder.py

@@ -44,17 +44,20 @@ echo "NEvents=$NEVENTS"
 echo "Random seed=$RSEED"
 echo "Pileup filelist=$PILEUP_FILELIST"
 
+TOPDIR=$PWD
 
 # GENSIM
 export SCRAM_ARCH=slc6_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 if [ -r CMSSW_10_2_22_GS/src ] ; then 
     echo release CMSSW_10_2_22_GS already exists
+    cd CMSSW_10_2_22_GS/src
+    eval `scram runtime -sh`
 else
     scram project -n "CMSSW_10_2_22_GS" CMSSW_10_2_22
+    cd CMSSW_10_2_22_GS/src
+    eval `scram runtime -sh`
 fi
-cd CMSSW_10_2_22_GS/src
-eval `scram runtime -sh`
 
 mkdir -pv $CMSSW_BASE/src/Configuration/GenProduction/python
 cp $FRAGMENT $CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py
@@ -64,7 +67,7 @@ if [ ! -f "$CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py" ]; th
 fi
 cd $CMSSW_BASE/src
 scram b
-cd ../..
+cd $TOPDIR
 
 #cat $CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py
 cmsDriver.py Configuration/GenProduction/python/fragment.py \
@@ -97,20 +100,24 @@ if [ -r CMSSW_10_2_13_DR/src ] ; then
     echo release CMSSW_10_2_13_DR already exists
     cd CMSSW_10_2_13_DR/src
     eval `scram runtime -sh`
+elif [ -z $MYOMC ] && [ -r $MYOMC/CMSSW_10_2_13_DR ]; then 
+    echo Using precompiled release at $MYOMC/CMSSW_10_2_13_DR
+    cd $MYOMC/CMSSW_10_2_13_DR/src
+    eval `scram runtime -sh`    
 else
-    echo "Checking out new DR release and editing"
+    echo "Checking out new DR release and patching"
     scram project -n "CMSSW_10_2_13_DR" CMSSW_10_2_13
     cd CMSSW_10_2_13_DR/src
     eval `scram runtime -sh`
     # Hack configBuilder to be less dumb
     git cms-addpkg Configuration/Applications
-    git cms-merge-topic kpedro88:filesFromList_102X
+    git cherry-pick 6c56c41899274246b2c9ba777f12ba9c1155acd6^..ca45cfac90f87030695fea8b328f08bb5c4c6998
     sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
     sed -i "s/print(\"found/print(\"redacted\")#print(\"found files/g" Configuration/Applications/python/ConfigBuilder.py
     sed -i "s/print \"found/print \"redacted\"#print \"found files/g" Configuration/Applications/python/ConfigBuilder.py
 fi
 scram b -j8
-cd ../../
+cd $TOPDIR
 
 cmsDriver.py step1 \
     --filein "file:RunIIFall18GENSIM_$NAME_$JOBINDEX.root" \
@@ -161,14 +168,21 @@ fi
 # RECOBParking
 export SCRAM_ARCH=slc6_amd64_gcc700
 if [ -r CMSSW_10_2_14_RECOBParking/src ] ; then 
- echo release CMSSW_10_2_14_RECOBParking already exists
+    echo "release CMSSW_10_2_14_RECOBParking already exists"
+    cd CMSSW_10_2_14_RECOBParking/src
+    eval `scram runtime -sh`
+elif [ -z $MYOMC ] && [ -r $MYOMC/CMSSW_10_2_14_RECOBParking ]; then 
+    echo "Using precompiled release at $MYOMC/CMSSW_10_2_14_RECOBParking"
+    cd $MYOMC/CMSSW_10_2_14_RECOBParking/src
+    eval `scram runtime -sh`    
 else
- scram project -n "CMSSW_10_2_14_RECOBParking" CMSSW_10_2_14
+    scram project -n "CMSSW_10_2_14_RECOBParking" CMSSW_10_2_14
+    cd CMSSW_10_2_14_RECOBParking/src
+    eval `scram runtime -sh`
 fi
-cd CMSSW_10_2_14_RECOBParking/src
-eval `scram runtime -sh`
 scram b
-cd ../../
+cd $TOPDIR
+
 cmsDriver.py step1 \
     --filein "file:RunIIFall18DRstep1_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIIFall18RECOBParking_$NAME_$JOBINDEX.root" \
@@ -193,10 +207,10 @@ fi
 
 # MiniAOD
 # Use same CMSSW as RECOBParking
-cd CMSSW_10_2_14_RECOBParking/src
-eval `scram runtime -sh`
-scram b
-cd ../../
+#cd CMSSW_10_2_14_RECOBParking/src
+#eval `scram runtime -sh`
+#scram b
+cd $TOPDIR
 
 # I know this is supposed to be Autumn18, but whatever
 cmsDriver.py step1 \
@@ -234,7 +248,7 @@ fi
 #cd CMSSW_10_2_18_NanoAOD/src
 #eval `scram runtime -sh`
 #scram b
-#cd ../../
+#cd $TOPDIR
 #
 #cmsDriver.py step1 \
 #   --filein "file:RunIIFall18MiniAOD_$NAME_$JOBINDEX.root" \

@@ -42,6 +42,7 @@ echo "NEvents=$NEVENTS"
 echo "Random seed=$RSEED"
 echo "Pileup filelist=$PILEUP_FILELIST"
 
+TOPDIR=$PWD
 
 # GENSIM
 export SCRAM_ARCH=slc6_amd64_gcc700 #slc7_amd64_gcc700
@@ -62,7 +63,7 @@ if [ ! -f "$CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py" ]; th
 fi
 cd $CMSSW_BASE/src
 scram b
-cd ../..
+cd $TOPDIR
 
 #cat $CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py
 
@@ -98,25 +99,25 @@ if [ -r CMSSW_10_2_5_DRMiniAOD ] ; then
     echo release CMSSW_10_2_5_DRMiniAOD already exists
     cd CMSSW_10_2_5_DRMiniAOD/src
     eval `scram runtime -sh`
-elif [ -r $MYOMC/CMSSW_10_2_5_DRMiniAOD ] ; then 
-    echo release CMSSW_10_2_5_DRMiniAOD already exists
-    cd CMSSW_10_2_5_DRMiniAOD/src
+elif [ -z $MYOMC ] && [ -r $MYOMC/CMSSW_10_2_5_DRMiniAOD ]; then 
+    echo Using precompiled release at $MYOMC/CMSSW_10_2_5_DRMiniAOD
+    cd $MYOMC/CMSSW_10_2_5_DRMiniAOD/src
     eval `scram runtime -sh`    
 else
-    echo "Checking out new DR release and editing"
+    echo "Checking out new DR release and patching"
     scram project -n "CMSSW_10_2_5_DRMiniAOD" CMSSW_10_2_5
     cd CMSSW_10_2_5_DRMiniAOD/src
     eval `scram runtime -sh`
     # Hack configBuilder to be less dumb
     git cms-addpkg Configuration/Applications
-	git cms-merge-topic kpedro88:filesFromList_102X
+	git cherry-pick 6c56c41899274246b2c9ba777f12ba9c1155acd6^..ca45cfac90f87030695fea8b328f08bb5c4c6998
     sed -i "s/if not entry in prim:/if True:/g" Configuration/Applications/python/ConfigBuilder.py
     sed -i "s/print(\"found/print(\"redacted\")#print(\"found files/g" Configuration/Applications/python/ConfigBuilder.py
     sed -i "s/print \"found/print \"redacted\"#print \"found files/g" Configuration/Applications/python/ConfigBuilder.py
 fi
 #cat Configuration/Applications/python/ConfigBuilder.py
 scram b -j8
-cd ../../
+cd $TOPDIR
 
 cmsDriver.py step1 \
 	--filein "file:RunIIFall18GENSIM_$NAME_$JOBINDEX.root" \
@@ -199,13 +200,17 @@ fi
 #source /cvmfs/cms.cern.ch/cmsset_default.sh
 #if [ -r CMSSW_10_2_18_NanoAOD/src ] ; then 
 # echo release CMSSW_10_2_18_NanoAOD already exists
+#elif [ -z $MYOMC ] && [ -r $MYOMC/CMSSW_10_2_18_NanoAOD ]; then 
+#    echo Using precompiled release at $MYOMC/CMSSW_10_2_18_NanoAOD
+#    cd $MYOMC/CMSSW_10_2_18_NanoAOD/src
+#    eval `scram runtime -sh`    
 #else
 #scram project -n "CMSSW_10_2_18_NanoAOD" CMSSW_10_2_18
 #fi
 #cd CMSSW_10_2_18_NanoAOD/src
 #eval `scram runtime -sh`
 #scram b
-#cd ../../
+#cd $TOPDIR
 #
 #cmsDriver.py step1 \
 #	--filein "file:RunIIFall18MiniAOD_$NAME_$JOBINDEX.root" \
