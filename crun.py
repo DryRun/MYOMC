@@ -197,8 +197,6 @@ if __name__ == "__main__":
     else:
         job_os = args.os
     csub_command += " --os {}".format(job_os)
-    if args.seed_offset:
-        csub_command += " --seed_offset {}".format(args.seed_offset)
     os.system(csub_command)
 
     os.chdir(cwd)
