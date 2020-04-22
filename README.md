@@ -6,13 +6,14 @@ Setup instructions (note: `git cms-addpkg` has to work):
 ```
 git clone git@github.com:DryRun/MYOMC.git
 cd MYOMC
-source env.sh
+source firsttime.sh
 # For future sessions, run env.sh
 ```
 
 
 Local example:
 ```
+cd $MYOMC/test
 
 ```
 

@@ -36,6 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--gfalcp", type=str, help="Transfer output files with gfalcp")
     parser.add_argument("--os", type=str, help="Force SLC7 or CC7 (might not work!)")
     parser.add_argument("--seed_offset", type=int, default=0, help="Offset random seed (useful for extending previous runs)")
+    parser.add_argument("--mem", type=int, default=7900, help="Memory to request")
     args = parser.parse_args()
 
     # Campaign check
@@ -184,7 +185,7 @@ if __name__ == "__main__":
                         ]
     if args.env:
         files_to_transfer.append("{}/{}/env.tar.gz".format(MYOMCPATH, args.campaign))
-    csub_command = "csub runwrapper.sh -t tomorrow --mem 11900 --nCores 8 -F {} --queue_n {} -x $HOME/private/x509up".format(",".join(files_to_transfer), args.njobs) # 
+    csub_command = "csub runwrapper.sh -t tomorrow --mem {} --nCores 8 -F {} --queue_n {} -x $HOME/private/x509up".format(args.mem, ",".join(files_to_transfer), args.njobs) # 
     if not args.os:
         # Infer OS from campaign
         if "RunII" in args.campaign:
