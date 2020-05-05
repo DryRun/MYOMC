@@ -187,7 +187,11 @@ if __name__ == "__main__":
                         ]
     if args.env:
         files_to_transfer.append("{}/{}/env.tar.gz".format(MYOMCPATH, args.campaign))
-    csub_command = "csub runwrapper.sh -t tomorrow --mem {} --nCores 8 -F {} --queue_n {} -x $HOME/private/x509up".format(args.mem, ",".join(files_to_transfer), args.njobs) # 
+    csub_command = "csub runwrapper.sh -t tomorrow --mem {} --nCores {} -F {} --queue_n {} -x $HOME/private/x509up".format(
+                        args.mem,
+                        args.max_nthreads, 
+                        ",".join(files_to_transfer), 
+                        args.njobs) # 
     if not args.os:
         # Infer OS from campaign
         if "RunII" in args.campaign:
