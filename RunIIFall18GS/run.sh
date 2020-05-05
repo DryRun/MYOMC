@@ -34,7 +34,12 @@ if [ -z "$5" ]; then
 else
 	PILEUP_FILELIST=$5
 fi
-#PILEUP_PICKLE="pileup_RunIIFall18GS.pkl"
+
+if [ -z "$6" ]; then
+    MAX_NTHREADS=8
+else
+    MAX_NTHREADS=$6
+fi
 
 echo "Fragment=$FRAGMENT"
 echo "Job name=$NAME"

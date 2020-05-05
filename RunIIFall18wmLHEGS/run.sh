@@ -42,7 +42,12 @@ if [ -z "$5" ]; then
 else
 	PILEUP_FILELIST=$5
 fi
-#PILEUP_PICKLE="pileup_RunIIFall18GS.pkl"
+
+if [ -z "$6" ]; then
+    MAX_NTHREADS=8
+else
+    MAX_NTHREADS=$6
+fi
 
 echo "Fragment=$FRAGMENT"
 echo "Job name=$NAME"
@@ -85,7 +90,7 @@ cmsDriver.py Configuration/GenProduction/python/fragment.py \
 	--conditions 102X_upgrade2018_realistic_v11 \
 	--beamspot Realistic25ns13TeVEarly2018Collision \
 	--step LHE,GEN,SIM \
-	--nThreads 8 \
+    --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
 	--geometry DB:Extended \
 	--era Run2_2018 \
 	--python_filename "RunIIFall18wmLHEGS_${NAME}_cfg.py" \
@@ -140,7 +145,7 @@ cmsDriver.py step1 \
 	--conditions 102X_upgrade2018_realistic_v15 \
 	--step DIGI,DATAMIX,L1,DIGI2RAW,HLT:@relval2018 \
 	--procModifiers premix_stage2 \
-	--nThreads 8 \
+    --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
 	--geometry DB:Extended \
 	--datamix PreMix \
 	--era Run2_2018 \
@@ -166,7 +171,7 @@ cmsDriver.py step2 \
 	--conditions 102X_upgrade2018_realistic_v15 \
 	--step RAW2DIGI,L1Reco,RECO,RECOSIM,EI \
 	--procModifiers premix_stage2 \
-	--nThreads 8 \
+    --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
 	--era Run2_2018 \
 	--python_filename "RunIIFall18DRstep2_${NAME}_cfg.py" \
 	--no_exec \
@@ -191,7 +196,7 @@ cmsDriver.py step1 \
 	--datatier MINIAODSIM \
 	--conditions 102X_upgrade2018_realistic_v15 \
 	--step PAT \
-	--nThreads 8 \
+    --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
 	--geometry DB:Extended \
 	--era Run2_2018 \
 	--python_filename "RunIIFall18MiniAOD_${NAME}_cfg.py" \
@@ -226,7 +231,7 @@ fi
 #	--datatier NANOAODSIM \
 #	--conditions 102X_upgrade2018_realistic_v20 \
 #	--step NANO \
-#	--nThreads 2 \
+#   --nThreads $(( $MAX_NTHREADS < 2 ? $MAX_NTHREADS : 2 )) \
 #	--era Run2_2018,run2_nanoAOD_102Xv1 \
 #	--python_filename "RunIIFall18NanoAOD_${NAME}_cfg.py" \
 #	--no_exec \
