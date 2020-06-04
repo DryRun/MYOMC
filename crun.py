@@ -24,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument("fragment", type=str, help="Path to fragment")
     parser.add_argument("campaign", type=str, help="Name of campaign")
     parser.add_argument("--env", "-e", action="store_true", help="Use pre-packaged CMSSW environments (run setup_env.sh first)")
+    parser.add_argument("--pileup_file", "-p", type=str, help="Use premade pileup input file instead of DAS query (saves some time)")
     parser.add_argument("--nevents_job", type=int, default=100, help="Number of events per job")
     parser.add_argument("--njobs", type=int, default=1, help="Number jobs")
     parser.add_argument("--keepNANOGEN", action="store_true", help="Keep NANOGEN")
@@ -35,7 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--outEOS", type=str, help="Transfer files to EOS instead of back to AFS")
     parser.add_argument("--outcp", type=str, help="Transfer output files with cp")
     parser.add_argument("--gfalcp", type=str, help="Transfer output files with gfalcp")
-    parser.add_argument("--os", type=str, help="Force SLC7 or CC7 (might not work!)")
+    parser.add_argument("--os", type=str, help="Force SLC6 or CC7 (might not work!)")
     parser.add_argument("--seed_offset", type=int, default=0, help="Offset random seed (useful for extending previous runs)")
     parser.add_argument("--mem", type=int, default=7900, help="Memory to request")
     parser.add_argument("--max_nthreads", type=int, default=8, help="Maximum number of threads (reduce if condor priority is a problem)")
@@ -102,13 +103,16 @@ if __name__ == "__main__":
             run_script.write("    cd $_CONDOR_SCRATCH_DIR/work\n")
             run_script.write("done\n")
         #run_script.write("env\n")
-        command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $(($1+{})) filelist:$_CONDOR_SCRATCH_DIR/pileupinput.dat {} 2>&1 ".format(
+        command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $(($1+{})) {} 2>&1 ".format(
             args.name, 
             os.path.basename(fragment_abspath), 
             args.nevents_job,
             args.seed_offset,
             args.max_nthreads
         )
+        if args.pileup_file:
+            command += " pileupinput.dat"
+        command += " 2>&1"
         run_script.write(command + "\n")
         #run_script.write("source run_BParkingNANO.sh {} $NEVENTS ./*MiniAOD*root".format(args.bnano_cfg))
         run_script.write("mv *py $_CONDOR_SCRATCH_DIR\n")
@@ -195,8 +199,9 @@ if __name__ == "__main__":
 
     files_to_transfer = [fragment_abspath, 
                             "{}/{}/run.sh".format(MYOMCPATH, args.campaign), 
-                            "{}/{}/pileupinput.dat".format(MYOMCPATH, args.campaign), 
                         ]
+    if args.pileup_file:
+        files_to_transfer.append("{}/{}/pileupinput.dat".format(MYOMCPATH, args.campaign))
     if args.env:
         files_to_transfer.append("{}/{}/env.tar.gz".format(MYOMCPATH, args.campaign))
     csub_command = "csub runwrapper.sh -t tomorrow --mem {} --nCores {} -F {} --queue_n {} -x $HOME/private/x509up".format(

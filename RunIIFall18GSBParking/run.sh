@@ -32,15 +32,15 @@ fi
 RSEED=$((JOBINDEX + 1001))
 
 if [ -z "$5" ]; then
-    PILEUP_FILELIST="filelist:$MYOMCPATH/RunIIFall18GSBParking/pileupinput.dat"
+    MAX_NTHREADS=8
 else
-    PILEUP_FILELIST=$5
+    MAX_NTHREADS=$5
 fi
 
 if [ -z "$6" ]; then
-    MAX_NTHREADS=8
+    PILEUP_FILELIST="dbs:/MinBias_TuneCP5_13TeV-pythia8/RunIIFall18GS-102X_upgrade2018_realistic_v9-v1/GEN-SIM"
 else
-    MAX_NTHREADS=$6
+    PILEUP_FILELIST=$6
 fi
 
 echo "Fragment=$FRAGMENT"

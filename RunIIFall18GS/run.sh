@@ -30,16 +30,18 @@ fi
 RSEED=$((JOBINDEX + 1001))
 
 if [ -z "$5" ]; then
-    PILEUP_FILELIST="filelist:$MYOMCPATH/RunIIFall18GS/pileupinput.dat"
+    MAX_NTHREADS=8
 else
-	PILEUP_FILELIST=$5
+    MAX_NTHREADS=$5
 fi
 
 if [ -z "$6" ]; then
-    MAX_NTHREADS=8
+    PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/RunIISummer17PrePremix-PUAutumn18_102X_upgrade2018_realistic_v15-v1/GEN-SIM-DIGI-RAW"
 else
-    MAX_NTHREADS=$6
+	PILEUP_FILELIST=$6
 fi
+
+
 
 echo "Fragment=$FRAGMENT"
 echo "Job name=$NAME"
