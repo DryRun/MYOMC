@@ -26,8 +26,9 @@ if __name__ == "__main__":
     parser.add_argument("--env", "-e", action="store_true", help="Use pre-packaged CMSSW environments (run setup_env.sh first)")
     parser.add_argument("--nevents_job", type=int, default=100, help="Number of events per job")
     parser.add_argument("--njobs", type=int, default=1, help="Number jobs")
-    parser.add_argument("--keepNano", action='store_true', help="Keep NanoAOD")
-    parser.add_argument("--keepMini", action='store_true', help="Keep MiniAOD")
+    parser.add_argument("--keepNANOGEN", action="store_true", help="Keep NANOGEN")
+    parser.add_argument("--keepNANO", action='store_true', help="Keep NanoAOD")
+    parser.add_argument("--keepMINI", action='store_true', help="Keep MiniAOD")
     parser.add_argument("--keepDR", action='store_true', help="Keep DR")
     parser.add_argument("--keepRECO", action='store_true', help="Keep RECO")
     parser.add_argument("--keepGS", action='store_true', help="Keep GS")
@@ -113,9 +114,11 @@ if __name__ == "__main__":
         run_script.write("mv *py $_CONDOR_SCRATCH_DIR\n")
 
         if args.outEOS:
-            if args.keepNano:
+            if args.keepNANOGEN:
+                run_script.write("xrdcp *NANOGEN*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
+            if args.keepNANO:
                 run_script.write("xrdcp *NanoAOD*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
-            if args.keepMini:
+            if args.keepMINI:
                 run_script.write("xrdcp *MiniAOD*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
             if args.keepDR:
                 run_script.write("xrdcp *DR*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
@@ -125,9 +128,11 @@ if __name__ == "__main__":
                 run_script.write("xrdcp *GS*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
         elif args.outcp:
             run_script.write("mkdir -pv {} \n".format(args.outcp))
-            if args.keepNano:
+            if args.keepNANOGEN:
+                run_script.write("cp *NANOGEN*root {} \n".format(args.outcp))
+            if args.keepNANO:
                 run_script.write("cp *NanoAOD*root {} \n".format(args.outcp))
-            if args.keepMini:
+            if args.keepMINI:
                 run_script.write("cp *MiniAOD*root {} \n".format(args.outcp))
             if args.keepDR:
                 run_script.write("cp *DR*root {} \n".format(args.outcp))
@@ -140,12 +145,17 @@ if __name__ == "__main__":
             run_script.write("echo \"Contents of current directory:\n\"")
             run_script.write("ls -lrth \n")
             run_script.write("scram unsetenv\n")
-            if args.keepNano:
+            if args.keepNANOGEN:
+                run_script.write("for FILENAME in ./*NANOGEN*root; do\n")
+                run_script.write("   echo \"Copying $FILENAME\"\n")
+                run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
+                run_script.write("done\n")
+            if args.keepNANO:
                 run_script.write("for FILENAME in ./*NanoAOD*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
                 run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
-            if args.keepMini:
+            if args.keepMINI:
                 run_script.write("for FILENAME in ./*MiniAOD*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
                 run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
@@ -166,9 +176,11 @@ if __name__ == "__main__":
                 run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
         else:
-            if args.keepNano:
+            if args.keepNANOGEN:
+                run_script.write("mv *NANOGEN*root $_CONDOR_SCRATCH_DIR\n")
+            if args.keepNANO:
                 run_script.write("mv *NanoAOD*root $_CONDOR_SCRATCH_DIR\n")
-            if args.keepMini:
+            if args.keepMINI:
                 run_script.write("mv *MiniAOD*root $_CONDOR_SCRATCH_DIR\n")
             if args.keepDR:
                 run_script.write("mv *DR*root $_CONDOR_SCRATCH_DIR\n")
