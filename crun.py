@@ -41,7 +41,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Campaign check
-    if not args.campaign in ["RunIIFall18GS", "RunIIFall18GSBParking"]:
+    if not args.campaign in ["RunIIFall18GS", "RunIIFall18GSBParking", "NANOGEN"]:
         raise ValueError("Unknown campaign: {}".format(args.campaign))
 
     # Check fragment exists
