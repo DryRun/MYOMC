@@ -95,7 +95,7 @@ cmsDriver.py Configuration/GenProduction/python/fragment_$NAME.py \
     --nThreads $MAX_NTHREADS \
     --geometry DB:Extended \
     --era Run2_2017,run2_nanoAOD_94XMiniAODv2 \
-    --python_filename "RunIIFall17wmLHEGEN_NANOGEN_${NAME}_cfg.py" \
+    --python_filename "NANOGEN_${NAME}_cfg.py" \
     --no_exec \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed=${RSEED}" \
