@@ -84,7 +84,7 @@ cd $TOPDIR
 #cat $CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py
 
 # cmsDriver and run
-cmsDriver.py Configuration/GenProduction/python/fragment_$NAME.py \
+cmsDriver.py Configuration/GenProduction/python/fragment.py \
     --fileout "file:NANOGEN_$NAME_$JOB_INDEX.root" \
     --mc \
     --eventcontent NANOAODGEN \
