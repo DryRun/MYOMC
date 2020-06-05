@@ -85,7 +85,7 @@ cd $TOPDIR
 
 # cmsDriver and run
 cmsDriver.py Configuration/GenProduction/python/fragment.py \
-    --fileout "file:NANOGEN_$NAME_$JOB_INDEX.root" \
+    --fileout "file:NANOGEN_$NAME_$JOBINDEX.root" \
     --mc \
     --eventcontent NANOAODGEN \
     --datatier NANOGEN \
