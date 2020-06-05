@@ -220,6 +220,8 @@ if __name__ == "__main__":
             job_os = "SLCern6"
         elif "UL" in args.campaign:
             job_os = "CentOS7"
+        elif args.campaign == "NANOGEN":
+            job_os = "SLCern6"
         else:
             print "Unable to infer OS from campaign {}. Using CC7.".format(args.campaign)
             job_os = "CentOS7"
