@@ -69,8 +69,8 @@ if __name__ == "__main__":
 
     # For args.outEOS, make sure it's formatted correctly
     if args.outEOS:
-        if args.outEOS[:6] != "/store":
-            raise ValueError("Argument --outEOS must start with /store (you specified --outEOS {})".format(args.outEOS))
+        if args.outEOS[:6] != "/store" and args.outEOS[:5] != "/user":
+            raise ValueError("Argument --outEOS must start with /store or /user (you specified --outEOS {})".format(args.outEOS))
         if not os.path.isdir("/eos/uscms/{}".format(args.outEOS)):
             raise ValueError("Output EOS directory does not exist! (you specified --outEOS {}_".format(args.outEOS))
 
@@ -118,18 +118,23 @@ if __name__ == "__main__":
         run_script.write("mv *py $_CONDOR_SCRATCH_DIR\n")
 
         if args.outEOS:
+            if args.outEOS[:6] == "/store":
+                eos_prefix = "root://eoscms.cern.ch//eos/cms"
+            elif args.outEOS[:5] == "/user":
+                eos_prefix = "root://eosuser.cern.ch//eos"
+
             if args.keepNANOGEN:
-                run_script.write("xrdcp *NANOGEN*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
+                run_script.write("xrdcp *NANOGEN*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepNANO:
-                run_script.write("xrdcp *NanoAOD*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
+                run_script.write("xrdcp *NanoAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepMINI:
-                run_script.write("xrdcp *MiniAOD*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
+                run_script.write("xrdcp *MiniAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepDR:
-                run_script.write("xrdcp *DR*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
+                run_script.write("xrdcp *DR*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepRECO:
-                run_script.write("xrdcp *RECO*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
+                run_script.write("xrdcp *RECO*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepGS:
-                run_script.write("xrdcp *GS*root root://eoscms.cern.ch//eos/cms/{} \n".format(args.outEOS))
+                run_script.write("xrdcp *GS*root {}/{} \n".format(eos_prefix, args.outEOS))
         elif args.outcp:
             run_script.write("mkdir -pv {} \n".format(args.outcp))
             if args.keepNANOGEN:
