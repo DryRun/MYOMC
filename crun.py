@@ -9,7 +9,7 @@ if not MYOMCPATH:
     raise ValueError("Environment variable MYOMCPATH must be set. Call env.sh.")
 
 def make_proxy(proxy_path):
-    os.system("voms-proxy-init -voms cms -out {} -valid 72:00")
+    os.system("voms-proxy-init -voms cms -out {} -valid 72:00".format(proxy_path))
 
 def get_proxy_lifetime(proxy_path):
     import subprocess
@@ -73,6 +73,8 @@ if __name__ == "__main__":
             raise ValueError("Argument --outEOS must start with /store or /user (you specified --outEOS {})".format(args.outEOS))
         #if not os.path.isdir("/eos/uscms/{}".format(args.outEOS)):
         #    raise ValueError("Output EOS directory does not exist! (you specified --outEOS {}_".format(args.outEOS))
+        if not args.outEOS[-1] == "/":
+            args.outEOS += "/"
 
     # Create and move to working directory
     if os.path.isdir(args.name):
