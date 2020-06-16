@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     # For args.outEOS, make sure it's formatted correctly
     if args.outEOS:
-        if args.outEOS[:6] == "/store" and args.outEOS[:5] != "/user":
+        if args.outEOS[:6] != "/store" and args.outEOS[:5] != "/user":
             raise ValueError("Argument --outEOS must start with /store or /user (you specified --outEOS {})".format(args.outEOS))
         #if not os.path.isdir("/eos/uscms/{}".format(args.outEOS)):
         #    raise ValueError("Output EOS directory does not exist! (you specified --outEOS {}_".format(args.outEOS))
