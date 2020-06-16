@@ -5,7 +5,8 @@ if { [[ $SYSTEM_RELEASE == *"release 7"* ]]; }; then
   if { [[ $(hostname -s) = lxplus* ]]; }; then
   	ssh -Y lxplus6 "cd $PWD; source setup_env.sh;"
   elif { [[ $(hostname -s) = cmslpc* ]]; }; then
-  	ssh -Y cmslpc-sl6 "cd $PWD; source setup_env.sh;"
+    #ssh -Y cmslpc-sl6 "cd $PWD; source setup_env.sh;"
+    ssh -Y cmslpc23 "cd $PWD; source setup_env.sh;"
   else
   	echo "Not on cmslpc or lxplus, not sure what to do."
   	return 1
