@@ -3,6 +3,17 @@
 
 import os
 import sys
+import subprocess
+import socket
+
+hostname = socket.gethostname()
+if "cmslpc" in hostname:
+    host = "cmslpc"
+elif "lxplus" in hostname:
+    host = "lxplus"
+else:
+    raise ValueError("Unknown host {}".format(host))
+
 
 MYOMCPATH = os.getenv("MYOMCPATH")
 if not MYOMCPATH:
@@ -67,7 +78,7 @@ if __name__ == "__main__":
         if not args.os in ["SLCern6", "CentOS7"]:
             raise ValueError("--os must be SLCern6 or CentOS7.")
 
-    # For args.outEOS, make sure it's formatted correctly
+    # For args.outEOS, make sure it's formatted correctly, and make sure output dir exists
     if args.outEOS:
         if args.outEOS[:6] != "/store" and args.outEOS[:5] != "/user":
             raise ValueError("Argument --outEOS must start with /store or /user (you specified --outEOS {})".format(args.outEOS))
@@ -76,9 +87,32 @@ if __name__ == "__main__":
         if not args.outEOS[-1] == "/":
             args.outEOS += "/"
 
+        # Determine eos prefix
+        if args.outEOS[:6] == "/store" and host == "lxplus":
+            eos_prefix = "root://eoscms.cern.ch//eos/cms"
+        elif args.outEOS[:5] == "/user" and host == "lxplus":
+            eos_prefix = "root://eosuser.cern.ch//eos"
+        elif host == "cmslpc":
+            eos_prefix = "root://cmseos.fnal.gov"
+        else:
+            raise ValueError("Unable to determine EOS prefix")
+
+        # Create output directory
+        import subprocess
+        subp = subprocess.Popen("eos {} ls {}".format(eos_prefix, args.outEOS).split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = subp.communicate()
+        if subp.returncode == 0:
+            print("WARNING : EOS output directory {} already exists! Writing to existing directory, but be careful.")
+        else:
+            print("Creating EOS otuput directory {}".format(args.outEOS))
+            subp = subprocess.Popen("eos {} mkdir {}".format(eos_prefix, args.outEOS), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = subp.communicate()
+            print(stdout)
+            print(stderr)                       
+
     # Create and move to working directory
     if os.path.isdir(args.name):
-        raise ValueError("Output directory {} already exists!".format(args.name))
+        raise ValueError("Working directory {} already exists!".format(args.name))
     os.system("mkdir -pv {}".format(args.name))
     cwd = os.getcwd()
     os.chdir(args.name)
@@ -120,11 +154,6 @@ if __name__ == "__main__":
         run_script.write("mv *py $_CONDOR_SCRATCH_DIR\n")
 
         if args.outEOS:
-            if args.outEOS[:6] == "/store":
-                eos_prefix = "root://eoscms.cern.ch//eos/cms"
-            elif args.outEOS[:5] == "/user":
-                eos_prefix = "root://eosuser.cern.ch//eos"
-
             if args.keepNANOGEN:
                 run_script.write("xrdcp *NANOGEN*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepNANO:
