@@ -47,14 +47,14 @@ if __name__ == "__main__":
     parser.add_argument("--outEOS", type=str, help="Transfer files to EOS instead of back to AFS")
     parser.add_argument("--outcp", type=str, help="Transfer output files with cp")
     parser.add_argument("--gfalcp", type=str, help="Transfer output files with gfalcp")
-    parser.add_argument("--os", type=str, help="Force SLC6 or CC7 (might not work!)")
+    #parser.add_argument("--os", type=str, help="Force SLC6 or CC7 (might not work!)")
     parser.add_argument("--seed_offset", type=int, default=0, help="Offset random seed (useful for extending previous runs)")
     parser.add_argument("--mem", type=int, default=7900, help="Memory to request")
     parser.add_argument("--max_nthreads", type=int, default=8, help="Maximum number of threads (reduce if condor priority is a problem)")
     args = parser.parse_args()
 
     # Campaign check
-    if not args.campaign in ["RunIIFall18GS", "RunIIFall18GSBParking", "NANOGEN"]:
+    if not args.campaign in ["RunIIFall18GS", "RunIIFall18GSBParking", "RunIISummer20UL17wmLHE", "NANOGEN"]:
         raise ValueError("Unknown campaign: {}".format(args.campaign))
 
     # Check fragment exists
@@ -74,9 +74,9 @@ if __name__ == "__main__":
         os.system("voms-proxy-info")
 
     # Check OS
-    if args.os:
-        if not args.os in ["SLCern6", "CentOS7"]:
-            raise ValueError("--os must be SLCern6 or CentOS7.")
+    #if args.os:
+    #    if not args.os in ["SLCern6", "CentOS7"]:
+    #        raise ValueError("--os must be SLCern6 or CentOS7.")
 
     # For args.outEOS, make sure it's formatted correctly, and make sure output dir exists
     if args.outEOS:
@@ -89,9 +89,9 @@ if __name__ == "__main__":
 
         # Determine eos prefix
         if args.outEOS[:6] == "/store" and host == "lxplus":
-            eos_prefix = "root://eoscms.cern.ch//eos/cms"
+            eos_prefix = "root://eoscms.cern.ch/"
         elif args.outEOS[:5] == "/user" and host == "lxplus":
-            eos_prefix = "root://eosuser.cern.ch//eos"
+            eos_prefix = "root://eosuser.cern.ch/"
         elif host == "cmslpc":
             eos_prefix = "root://cmseos.fnal.gov"
         else:
@@ -104,18 +104,20 @@ if __name__ == "__main__":
         if subp.returncode == 0:
             print("WARNING : EOS output directory {} already exists! Writing to existing directory, but be careful.")
         else:
-            print("Creating EOS otuput directory {}".format(args.outEOS))
-            subp = subprocess.Popen("eos {} mkdir {}".format(eos_prefix, args.outEOS), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print("Creating EOS output directory {}".format(args.outEOS))
+            print("eos {} mkdir -p {}".format(eos_prefix, args.outEOS))
+            subp = subprocess.Popen("eos {} mkdir {}".format(eos_prefix, args.outEOS).split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = subp.communicate()
             print(stdout)
             print(stderr)                       
 
     # Create and move to working directory
-    if os.path.isdir(args.name):
-        raise ValueError("Working directory {} already exists!".format(args.name))
-    os.system("mkdir -pv {}".format(args.name))
+    csub_dir = "{}/{}".format(args.name, args.campaign)
+    if os.path.isdir(csub_dir):
+        raise ValueError("Working directory {} already exists!".format(csub_dir))
+    os.system("mkdir -pv {}".format(csub_dir))
     cwd = os.getcwd()
-    os.chdir(args.name)
+    os.chdir("{}".format(csub_dir))
 
     # Submit to condor
     with open("runwrapper.sh", 'w') as run_script:
@@ -245,9 +247,10 @@ if __name__ == "__main__":
                         args.max_nthreads, 
                         ",".join(files_to_transfer), 
                         args.njobs) # 
+    '''
     if not args.os:
         # Infer OS from campaign
-        if "RunII" in args.campaign:
+        if "RunII" in args.campaign and not "UL" in args.campaign:
             job_os = "SLCern6"
         elif "UL" in args.campaign:
             job_os = "CentOS7"
@@ -258,7 +261,9 @@ if __name__ == "__main__":
             job_os = "CentOS7"
     else:
         job_os = args.os
+    print("Using OS {}".format(job_os))
     csub_command += " --os {}".format(job_os)
+    '''
     os.system(csub_command)
 
     os.chdir(cwd)

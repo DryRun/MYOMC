@@ -53,19 +53,19 @@ TOPDIR=$PWD
 
 # NANOGEN
 # Setup CMSSW and merge NANOGEN stuff
-#export SCRAM_ARCH=slc6_amd64_gcc700
-if [ -r CMSSW_10_6_22_NANOGEN ] ; then
-    echo release CMSSW_10_6_22_NANOGEN already exists
-    cd CMSSW_10_6_22_NANOGEN/src
+export SCRAM_ARCH=slc6_amd64_gcc700
+if [ -r CMSSW_10_2_22_NANOGEN ] ; then
+    echo release CMSSW_10_2_22_NANOGEN already exists
+    cd CMSSW_10_2_22_NANOGEN/src
     eval `scram runtime -sh`
     scram b -j8
     cd $TOPDIR
 else
-    scram project -n "CMSSW_10_6_22_NANOGEN" CMSSW_10_6_22
-    cd CMSSW_10_6_22_NANOGEN/src
+    scram project -n "CMSSW_10_2_22_NANOGEN" CMSSW_10_2_22
+    cd CMSSW_10_2_22_NANOGEN/src
     eval `scram runtime -sh`
-    #git cms-init
-    #git cms-merge-topic DryRun:CMSSW_10_6_22-NANOGEN
+    git cms-init
+    git cms-merge-topic DryRun:CMSSW_10_2_22-NANOGEN
     scram b -j8
     cd $TOPDIR
 fi
@@ -85,19 +85,19 @@ cd $TOPDIR
 
 # cmsDriver and run
 cmsDriver.py Configuration/GenProduction/python/fragment.py \
-    --python_filename "NANOGEN_${NAME}_cfg.py" \
-    --eventcontent NANOAODGEN \
-    --customise Configuration/DataProcessing/Utils.addMonitoring \
-    --datatier NANOGEN \
     --fileout "file:NANOGEN_$NAME_$JOBINDEX.root" \
-    --conditions 106X_mc2017_realistic_v6 \
+    --mc \
+    --eventcontent NANOAODGEN \
+    --datatier NANOGEN \
+    --conditions 93X_mc2017_realistic_v3 \
     --beamspot Realistic25ns13TeVEarly2017Collision \
     --step LHE,GEN,NANOGEN \
-    --geometry DB:Extended \
-    --era Run2_2017,run2_nanoAOD_106Xv2 \
-    --no_exec \
-    --mc \
     --nThreads $MAX_NTHREADS \
+    --geometry DB:Extended \
+    --era Run2_2017,run2_nanoAOD_94XMiniAODv2 \
+    --python_filename "NANOGEN_${NAME}_cfg.py" \
+    --no_exec \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
     --customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed=${RSEED}" \
     -n $NEVENTS
 
