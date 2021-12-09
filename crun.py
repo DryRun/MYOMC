@@ -7,6 +7,7 @@ import subprocess
 import socket
 
 hostname = socket.gethostname()
+print(f"Detected host {hostname}")
 if "cmslpc" in hostname:
     host = "cmslpc"
 elif "lxplus" in hostname:
