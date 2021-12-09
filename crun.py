@@ -11,8 +11,10 @@ if "cmslpc" in hostname:
     host = "cmslpc"
 elif "lxplus" in hostname:
     host = "lxplus"
+elif "uscms" in hostname:
+    host = "cmsconnect"
 else:
-    raise ValueError("Unknown host {}".format(host))
+    raise ValueError("Unknown host {}".format(hostname))
 
 
 MYOMCPATH = os.getenv("MYOMCPATH")
@@ -95,6 +97,8 @@ if __name__ == "__main__":
             eos_prefix = "root://eosuser.cern.ch/"
         elif host == "cmslpc":
             eos_prefix = "root://cmseos.fnal.gov"
+        elif host == "cmsconnect":
+            eos_prefix = "root://cmsxrootd.fnal.gov/" # Assume we are transferring back to cmslpc
         else:
             raise ValueError("Unable to determine EOS prefix")
 
