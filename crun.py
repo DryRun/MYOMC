@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser.add_argument("fragment", type=str, help="Path to fragment")
     parser.add_argument("campaign", type=str, help="Name of campaign")
     parser.add_argument("--env", "-e", action="store_true", help="Use pre-packaged CMSSW environments (run setup_env.sh first)")
-    parser.add_argument("--pileup_file", "-p", type=str, help="Use premade pileup input file instead of DAS query (saves some time)")
+    parser.add_argument("--pileup_file", "-p", action="store_true", help="Use premade pileup input file instead of DAS query (saves some time)")
     parser.add_argument("--nevents_job", type=int, default=100, help="Number of events per job")
     parser.add_argument("--njobs", type=int, default=1, help="Number jobs")
     parser.add_argument("--keepNANOGEN", action="store_true", help="Keep NANOGEN")
@@ -51,6 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("--seed_offset", type=int, default=0, help="Offset random seed (useful for extending previous runs)")
     parser.add_argument("--mem", type=int, default=7900, help="Memory to request")
     parser.add_argument("--max_nthreads", type=int, default=8, help="Maximum number of threads (reduce if condor priority is a problem)")
+    parser.add_argument("--overwrite", "-f", action="store_true", help="Force overwrite outputs")
     args = parser.parse_args()
 
     # Campaign check
@@ -102,7 +103,7 @@ if __name__ == "__main__":
         subp = subprocess.Popen("eos {} ls {}".format(eos_prefix, args.outEOS).split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = subp.communicate()
         if subp.returncode == 0:
-            print("WARNING : EOS output directory {} already exists! Writing to existing directory, but be careful.")
+            print("WARNING : EOS output directory {} already exists! Writing to existing directory, but be careful.".format(args.outEOS))
         else:
             print("Creating EOS output directory {}".format(args.outEOS))
             print("eos {} mkdir -p {}".format(eos_prefix, args.outEOS))
@@ -113,8 +114,8 @@ if __name__ == "__main__":
 
     # Create and move to working directory
     csub_dir = "{}/{}".format(args.name, args.campaign)
-    if os.path.isdir(csub_dir):
-        raise ValueError("Working directory {} already exists!".format(csub_dir))
+    if os.path.isdir(csub_dir) and not args.overwrite:
+        raise ValueError("Working directory {} already exists! Specify -f to overwrite".format(csub_dir))
     os.system("mkdir -pv {}".format(csub_dir))
     cwd = os.getcwd()
     os.chdir("{}".format(csub_dir))
@@ -141,7 +142,7 @@ if __name__ == "__main__":
             run_script.write("    cd $_CONDOR_SCRATCH_DIR/work\n")
             run_script.write("done\n")
         #run_script.write("env\n")
-        command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $(($1+{})) {} 2>&1 ".format(
+        command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $(($1+{})) {} ".format(
             args.name, 
             os.path.basename(fragment_abspath), 
             args.nevents_job,
@@ -149,7 +150,7 @@ if __name__ == "__main__":
             args.max_nthreads
         )
         if args.pileup_file:
-            command += " pileupinput.dat"
+            command += " $_CONDOR_SCRATCH_DIR/pileupinput.dat"
         command += " 2>&1"
         run_script.write(command + "\n")
         #run_script.write("source run_BParkingNANO.sh {} $NEVENTS ./*MiniAOD*root".format(args.bnano_cfg))
@@ -159,9 +160,9 @@ if __name__ == "__main__":
             if args.keepNANOGEN:
                 run_script.write("xrdcp *NANOGEN*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepNANO:
-                run_script.write("xrdcp *NanoAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp *NANOAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepMINI:
-                run_script.write("xrdcp *MiniAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp *MINIAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepDR:
                 run_script.write("xrdcp *DR*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepRECO:
