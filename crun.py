@@ -99,7 +99,7 @@ if __name__ == "__main__":
         elif host == "cmslpc":
             eos_prefix = "root://cmseos.fnal.gov"
         elif host == "cmsconnect":
-            eos_prefix = "root://cmsxrootd.fnal.gov/" # Assume we are transferring back to cmslpc
+            eos_prefix = "root://cmseos.fnal.gov"
         else:
             raise ValueError("Unable to determine EOS prefix")
 
