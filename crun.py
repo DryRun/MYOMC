@@ -104,18 +104,33 @@ if __name__ == "__main__":
             raise ValueError("Unable to determine EOS prefix")
 
         # Create output directory
-        #import subprocess
-        #subp = subprocess.Popen("eos {} ls {}".format(eos_prefix, args.outEOS).split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        #stdout, stderr = subp.communicate()
-        #if subp.returncode == 0:
-        #    print("WARNING : EOS output directory {} already exists! Writing to existing directory, but be careful.".format(args.outEOS))
-        #else:
-        #    print("Creating EOS output directory {}".format(args.outEOS))
-        #    print("eos {} mkdir -p {}".format(eos_prefix, args.outEOS))
-        #    subp = subprocess.Popen("eos {} mkdir {}".format(eos_prefix, args.outEOS).split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        #    stdout, stderr = subp.communicate()
-        #    print(stdout)
-        #    print(stderr)                       
+        if host == "lxplus" or host == "cmslpc":
+            import subprocess
+            subp = subprocess.Popen("eos {} ls {}".format(eos_prefix, args.outEOS).split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = subp.communicate()
+            if subp.returncode == 0:
+                print("WARNING : EOS output directory {} already exists! Writing to existing directory, but be careful.".format(args.outEOS))
+            else:
+                print("Creating EOS output directory {}".format(args.outEOS))
+                print("eos {} mkdir -p {}".format(eos_prefix, args.outEOS))
+                subp = subprocess.Popen("eos {} mkdir {}".format(eos_prefix, args.outEOS).split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = subp.communicate()
+                print(stdout)
+                print(stderr)
+        elif host == "cmsconnect":
+            # Use gfal instead of eos
+            gfal_dir = f"gsiftp://cmseos-gridftp.fnal.gov//eos/uscms/{args.outEOS}"
+            import subprocess
+            subp = subprocess.Popen(f"gfal-ls {gfal_dir}".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = subp.communicate()
+            if subp.returncode == 0:
+                print("WARNING : EOS output directory {} already exists! Writing to existing directory, but be careful.".format(args.outEOS))
+            else:
+                print("Creating EOS output directory {}".format(args.outEOS))
+                subp = subprocess.Popen(f"gfal-mkdir -p {gfal_dir}".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = subp.communicate()
+                print(stdout)
+                print(stderr)
 
     # Create and move to working directory
     csub_dir = "{}/{}".format(args.name, args.campaign)
@@ -163,17 +178,17 @@ if __name__ == "__main__":
 
         if args.outEOS:
             if args.keepNANOGEN:
-                run_script.write("xrdcp -p *NANOGEN*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp -p -f *NANOGEN*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepNANO:
-                run_script.write("xrdcp -p *NANOAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp -p -f *NANOAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepMINI:
-                run_script.write("xrdcp -p *MINIAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp -p -f *MINIAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepDR:
-                run_script.write("xrdcp -p *DR*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp -p -f *DR*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepRECO:
-                run_script.write("xrdcp -p *RECO*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp -p -f *RECO*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepGS:
-                run_script.write("xrdcp -p *GS*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp -p -f *GS*root {}/{} \n".format(eos_prefix, args.outEOS))
         elif args.outcp:
             run_script.write("mkdir -pv {} \n".format(args.outcp))
             if args.keepNANOGEN:
