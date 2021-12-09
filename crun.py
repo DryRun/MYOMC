@@ -65,7 +65,7 @@ if __name__ == "__main__":
     fragment_abspath = os.path.abspath(args.fragment)
     if not os.path.isfile(fragment_abspath):
         raise ValueError("Couldn't find fragment at {}".format(fragment_abspath))
-    print "Using fragment at {}".format(fragment_abspath)
+    print("Using fragment at {}".format(fragment_abspath))
 
     # Check proxy, make new one if necessary
     proxy_path = os.path.expandvars("$HOME/private/x509up")
