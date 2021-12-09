@@ -90,6 +90,7 @@ if args.pythonpath:
 top_script_name = "condor_run_" + timestamp + ".sh"
 top_script = open(top_script_name, 'w')
 top_script.write("#!/bin/bash\n")
+top_script.write("start=`date +%s`\n")
 for env_name, env_value in env_to_transfer.items():
 	top_script.write("export " + env_name + "=" + env_value + "\n")
 #if args.cmssw_src:
@@ -129,6 +130,9 @@ top_script.write("\nContents of current directory:\n")
 top_script.write("ls -lrth\n")
 top_script.write("\nContents of top directory:\n")
 top_script.write("ls -lrth $_CONDOR_SCRATCH_DIR\n")
+top_script.write("end=`date +%s`\n")
+top_script.write("runtime=$((end-start))\n")
+top_script.write("echo \"Run time $runtime\"\n")
 top_script.close()
 files_to_transfer.append(top_script_name)
 
