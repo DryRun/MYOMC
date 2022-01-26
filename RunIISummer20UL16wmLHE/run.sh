@@ -1,6 +1,6 @@
 # Run private production using RunIIFall18GS settings.
 # Local example:
-# source run.sh MyMCName /path/to/fragment.py 1000 1 filelist:/path/to/pileup/list.txt
+# source run.sh MyMCName /path/to/fragment.py 1000 1 1 filelist:/path/to/pileup/list.txt
 # 
 # Batch example:
 # python crun.py MyMCName /path/to/fragment.py --outEOS /store/user/myname/somefolder --keepMini --nevents_job 10000 --njobs 100 --env
