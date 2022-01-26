@@ -61,13 +61,13 @@ TOPDIR=$PWD
 # wmLHE
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_10_6_27/src ] ; then 
-    echo release CMSSW_10_6_27 already exists
-    cd CMSSW_10_6_27/src
+if [ -r CMSSW_10_6_28_patch1/src ] ; then 
+    echo release CMSSW_10_6_28_patch1 already exists
+    cd CMSSW_10_6_28_patch1/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_10_6_27" CMSSW_10_6_27
-    cd CMSSW_10_6_27/src
+    scram project -n "CMSSW_10_6_28_patch1" CMSSW_10_6_28_patch1
+    cd CMSSW_10_6_28_patch1/src
     eval `scram runtime -sh`
 fi
 
@@ -248,13 +248,13 @@ fi
 # MiniAOD
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_10_6_20/src ] ; then
-    echo release CMSSW_10_6_20 already exists
-    cd CMSSW_10_6_20/src
+if [ -r CMSSW_10_6_25/src ] ; then
+    echo release CMSSW_10_6_25 already exists
+    cd CMSSW_10_6_25/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_10_6_20" CMSSW_10_6_20
-    cd CMSSW_10_6_20/src
+    scram project -n "CMSSW_10_6_25" CMSSW_10_6_25
+    cd CMSSW_10_6_25/src
     eval `scram runtime -sh`
 fi
 cd $CMSSW_BASE/src
