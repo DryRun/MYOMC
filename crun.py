@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Run gridpack to NANO on condor
 
 import os
@@ -47,6 +47,7 @@ if __name__ == "__main__":
     parser.add_argument("--keepDR", action='store_true', help="Keep DR")
     parser.add_argument("--keepRECO", action='store_true', help="Keep RECO")
     parser.add_argument("--keepGS", action='store_true', help="Keep GS")
+    parser.add_argument("--keepwmLHE", action='store_true', help="Keep wmLHE")
     parser.add_argument("--outEOS", type=str, help="Transfer files to EOS instead of back to AFS")
     parser.add_argument("--outcp", type=str, help="Transfer output files with cp")
     parser.add_argument("--gfalcp", type=str, help="Transfer output files with gfalcp")
@@ -189,6 +190,8 @@ if __name__ == "__main__":
                 run_script.write("xrdcp -p -f *RECO*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepGS:
                 run_script.write("xrdcp -p -f *GS*root {}/{} \n".format(eos_prefix, args.outEOS))
+            if args.keepwmLHE:
+                run_script.write("xrdcp -p -f *wmLHE*root {}/{} \n".format(eos_prefix, args.outEOS))
         elif args.outcp:
             run_script.write("mkdir -pv {} \n".format(args.outcp))
             if args.keepNANOGEN:
@@ -203,6 +206,8 @@ if __name__ == "__main__":
                 run_script.write("cp *RECO*root {} \n".format(args.outcp))
             if args.keepGS:
                 run_script.write("cp *GS*root {} \n".format(args.outcp))
+            if args.keepwmLHE:
+                run_script.write("cp *wmLHE*root {} \n".format(args.outcp))
         elif args.gfalcp:
             run_script.write("echo \"Starting gfal-cp from $PWD\n\"")
             run_script.write("echo \"Contents of current directory:\n\"")
@@ -238,6 +243,11 @@ if __name__ == "__main__":
                 run_script.write("   echo \"Copying $FILENAME\"\n")
                 run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
+            if args.keepwmLHE:
+                run_script.write("for FILENAME in ./*wmLHE*root; do\n")
+                run_script.write("   echo \"Copying $FILENAME\"\n")
+                run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
+                run_script.write("done\n")
         else:
             if args.keepNANOGEN:
                 run_script.write("mv *NANOGEN*root $_CONDOR_SCRATCH_DIR\n")
@@ -251,6 +261,8 @@ if __name__ == "__main__":
                 run_script.write("mv *RECO*root $_CONDOR_SCRATCH_DIR\n")
             if args.keepGS:
                 run_script.write("mv *GS*root $_CONDOR_SCRATCH_DIR\n")
+            if args.keepwmLHE:
+                run_script.write("mv *wmLHE*root $_CONDOR_SCRATCH_DIR\n")
         run_script.write("ls -lrth\n")
         run_script.write("pwd\n")
         run_script.write("ls -lrth $_CONDOR_SCRATCH_DIR\n")
