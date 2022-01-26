@@ -6,9 +6,22 @@
 #    --njobs 5 \
 #    --env
 
-crun.py test_zpqq $MYOMCPATH/test/fragment_zpqq.py RunIISummer20UL17wmLHE \
-    --outEOS "/store/user/dryu/DAZSLE/MC/test" \
-    --keepMINI \
-    --nevents_job 10 \
-    --njobs 10 \
-    --env
+queue=${1}
+if [ -z ${queue} ]; then
+    queue=local
+fi
+
+if [ "$queue" == "eos" ]; then
+    crun.py test_zpqq $MYOMCPATH/test/fragment_zpqq.py RunIISummer20UL17wmLHE \
+        --outEOS "/store/user/$USER/PrivateMC/test/" \
+        --keepMINI \
+        --nevents_job 10 \
+        --njobs 10 \
+        --env
+elif [ "$queue" == "local" ]; then
+    crun.py test_zpqq $MYOMCPATH/test/fragment_zpqq.py RunIISummer20UL17wmLHE \
+        --keepMINI \
+        --nevents_job 10 \
+        --njobs 10 \
+        --env
+fi
