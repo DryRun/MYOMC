@@ -36,7 +36,7 @@ Here's an example pythia fragment, which uses a Madgraph gridpack:
 
   <summary>fragment.py</summary>
   
-  <code>
+  <pre>
     
 import FWCore.ParameterSet.Config as cms
 
@@ -71,6 +71,6 @@ generator = cms.EDFilter("Pythia8ConcurrentHadronizerFilter",
     )
 )
     
-  </code>
+  </pre>
 
 </details>
