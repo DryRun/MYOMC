@@ -58,7 +58,6 @@ from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import 
 generator = cms.EDFilter("Pythia8ConcurrentHadronizerFilter",
     maxEventsToPrint = cms.untracked.int32(1),
     pythiaPylistVerbosity = cms.untracked.int32(1),
-    
     pythiaHepMCVerbosity = cms.untracked.bool(False),
     comEnergy = cms.double(13000.),
     PythiaParameters = cms.PSet(
