@@ -32,10 +32,10 @@ python localtest.py jobname path/to/fragment.py NANOGEN --nevents 10000
 # python crun.py jobname path/to/fragment.py NANOGEN -e --nevents_job 5000 --njobs 10 --keepNANOGEN # See crun.py for more condor options like output saving, memory requirements, etc.
 ```
 Here's an example pythia fragment, which uses a Madgraph gridpack:
-<details>
-  <summary>fragment.py</summary>
-  
+<b>
+
   <code>
+    
 import FWCore.ParameterSet.Config as cms
 
 externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
@@ -71,4 +71,4 @@ generator = cms.EDFilter("Pythia8ConcurrentHadronizerFilter",
 )
     
   </code>
-  </details>
+  </b>
