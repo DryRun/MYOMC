@@ -315,7 +315,7 @@ cmsDriver.py \
     --step NANO \
     --conditions 106X_mc2017_realistic_v9 \
     --era Run2_2017,run2_nanoAOD_106Xv2 \
-    --customise_commands=process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False))) \
+    --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \ \
     --filein "file:RunIISummer20UL17MINIAODSIM_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL17PFNANOAODSIM_$NAME_$JOBINDEX.root" \

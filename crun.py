@@ -124,7 +124,8 @@ if __name__ == "__main__":
                 print(stderr)
         elif host == "cmsconnect":
             # Use gfal instead of eos
-            gfal_dir = f"gsiftp://cmseos-gridftp.fnal.gov//eos/uscms/{args.outEOS}"
+            #gfal_dir = f"gsiftp://cmseos-gridftp.fnal.gov//eos/uscms/{args.outEOS}" # This no longer works -- cmsconnect doesn't seem to have gridftp installed
+            gfal_dir = f"root://cmseos.fnal.gov/{args.outEOS}"
             import subprocess
             subp = subprocess.Popen(f"gfal-ls {gfal_dir}".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = subp.communicate()
