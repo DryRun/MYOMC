@@ -44,7 +44,7 @@ fi
 RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed
 
 if [ -z "$6" ]; then
-    PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/RunIISummer20ULPrePremix-UL16_106X_mcRun2_asymptotic_v13-v1/PREMIX" 
+    PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/RunIISummer20ULPrePremix-UL17_106X_mc2017_realistic_v6-v3/PREMIX"
 else
     PILEUP_FILELIST="filelist:$6"
 fi
@@ -83,25 +83,25 @@ cd $TOPDIR
 #cat $CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py
 
 cmsDriver.py Configuration/GenProduction/python/fragment.py \
-    --python_filename "RunIISummer20UL16wmLHEGEN_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL17wmLHE_${NAME}_cfg.py" \
     --eventcontent RAWSIM,LHE \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN,LHE \
-    --fileout "file:RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root" \
-    --conditions 106X_mcRun2_asymptotic_v13 \
-    --beamspot Realistic25ns13TeV2016Collision \
+    --fileout "file:RunIISummer20UL17wmLHE_$NAME_$JOBINDEX.root" \
+    --conditions 106X_mc2017_realistic_v6 \
+    --beamspot Realistic25ns13TeVEarly2017Collision \
     --step LHE,GEN \
     --geometry DB:Extended \
-    --era Run2_2016 \
+    --era Run2_2017 \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed=${RSEED}" \
     --mc \
     -n $NEVENTS 
 
-cmsRun "RunIISummer20UL16wmLHEGEN_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "RunIISummer20UL17wmLHE_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL17wmLHE_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL17wmLHE_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -123,25 +123,26 @@ scram b
 cd $TOPDIR
 
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16SIM_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL17SIM_${NAME}_cfg.py" \
 	--eventcontent RAWSIM \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	--datatier GEN-SIM \
-    --fileout "file:RunIISummer20UL16SIM_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
-	--beamspot Realistic25ns13TeV2016Collision \
+    --fileout "file:RunIISummer20UL17SIM_$NAME_$JOBINDEX.root" \
+	--conditions 106X_mc2017_realistic_v6 \
+	--beamspot Realistic25ns13TeVEarly2017Collision \
 	--step SIM \
 	--geometry DB:Extended \
-    --filein "file:RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root" \
-	--era Run2_2016 \
+    --filein "file:RunIISummer20UL17wmLHE_$NAME_$JOBINDEX.root" \
+	--era Run2_2017 \
 	--runUnscheduled \
 	--no_exec \
 	--mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
-cmsRun "RunIISummer20UL16SIM_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16SIM_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16SIM_$NAME_$JOBINDEX.root not found. Exiting."
+
+cmsRun "RunIISummer20UL17SIM_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL17SIM_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL17SIM_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -149,27 +150,27 @@ fi
 # DIGIPremix
 cd $TOPDIR
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16DIGIPremix_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL17DIGIPremix_${NAME}_cfg.py" \
 	--eventcontent PREMIXRAW \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	--datatier GEN-SIM-DIGI \
-    --filein "file:RunIISummer20UL16SIM_$NAME_$JOBINDEX.root" \
-    --fileout "file:RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" \
+    --filein "file:RunIISummer20UL17SIM_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL17DIGIPremix_$NAME_$JOBINDEX.root" \
     --pileup_input "$PILEUP_FILELIST" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
+	--conditions 106X_mc2017_realistic_v6 \
 	--step DIGI,DATAMIX,L1,DIGI2RAW \
 	--procModifiers premix_stage2 \
 	--geometry DB:Extended \
 	--datamix PreMix \
-	--era Run2_2016 \
+	--era Run2_2017 \
 	--runUnscheduled \
 	--no_exec \
 	--mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
-cmsRun "RunIISummer20UL16DIGIPremix_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "RunIISummer20UL17DIGIPremix_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL17DIGIPremix_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL17DIGIPremix_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -177,13 +178,13 @@ fi
 # HLT
 export SCRAM_ARCH=slc7_amd64_gcc630
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_8_0_33_UL/src ] ; then
-    echo release CMSSW_8_0_33_UL already exists
-    cd CMSSW_8_0_33_UL/src
+if [ -r CMSSW_9_4_14_UL_patch1/src ] ; then
+    echo release CMSSW_9_4_14_UL_patch1 already exists
+    cd CMSSW_9_4_14_UL_patch1/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_8_0_33_UL" CMSSW_8_0_33_UL
-    cd CMSSW_8_0_33_UL/src
+    scram project -n "CMSSW_9_4_14_UL_patch1" CMSSW_9_4_14_UL_patch1
+    cd CMSSW_9_4_14_UL_patch1/src
     eval `scram runtime -sh`
 fi
 cd $CMSSW_BASE/src
@@ -191,25 +192,23 @@ scram b
 cd $TOPDIR
 
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16HLT_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL17HLT_${NAME}_cfg.py" \
     --eventcontent RAWSIM \
-    ---inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
-    ---outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN-SIM-RAW \
-    --filein "file:RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" \
-    --fileout "file:RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" \
-    --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
-    ---customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
-    --step HLT:25ns15e33_v4 \
+    --filein "file:RunIISummer20UL17DIGIPremix_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL17HLT_$NAME_$JOBINDEX.root" \
+    --conditions 94X_mc2017_realistic_v15 \
+    --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
+    --step HLT:2e34v40 \
     --geometry DB:Extended \
-    --era Run2_2016 \
+    --era Run2_2017 \
     --no_exec \
     --mc \
     -n $NEVENTS
-cmsRun "RunIISummer20UL16HLT_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16HLT_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "RunIISummer20UL17HLT_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL17HLT_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL17HLT_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -223,24 +222,24 @@ scram b
 cd $TOPDIR
 
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16RECO_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL17RECO_${NAME}_cfg.py" \
 	--eventcontent AODSIM \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	--datatier AODSIM \
-    --filein "file:RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" \
-    --fileout "file:RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
+    --filein "file:RunIISummer20UL17HLT_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL17RECO_$NAME_$JOBINDEX.root" \
+	--conditions 106X_mc2017_realistic_v6 \
 	--step RAW2DIGI,L1Reco,RECO,RECOSIM \
 	--geometry DB:Extended \
-	--era Run2_2016 \
+	--era Run2_2017 \
 	--runUnscheduled \
 	--no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
 	--mc \
     -n $NEVENTS 
-cmsRun "RunIISummer20UL16RECO_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16RECO_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "RunIISummer20UL17RECO_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL17RECO_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL17RECO_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -262,24 +261,68 @@ scram b
 cd $TOPDIR
 
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16MINIAODSIM_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL17MINIAODSIM_${NAME}_cfg.py" \
 	--eventcontent MINIAODSIM \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	--datatier MINIAODSIM \
-    --filein "file:RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" \
-    --fileout "file:RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v17 \
+    --filein "file:RunIISummer20UL17RECO_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL17MINIAODSIM_$NAME_$JOBINDEX.root" \
+	--conditions 106X_mc2017_realistic_v9 \
 	--step PAT \
 	--procModifiers run2_miniAOD_UL \
 	--geometry DB:Extended \
-	--era Run2_2016 \
+	--era Run2_2017 \
 	--runUnscheduled \
 	--no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
 	--mc \
-    -n $NEVENTS    
-cmsRun "RunIISummer20UL16MINIAODSIM_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
+    -n $NEVENTS
+cmsRun "RunIISummer20UL17MINIAODSIM_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL17MINIAODSIM_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL17MINIAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
+    return 1
+fi
+
+# PFNano
+export SCRAM_ARCH=slc7_amd64_gcc700
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r CMSSW_10_6_26_PFNano/src ] ; then
+    echo release CMSSW_10_6_26_PFNano already exists
+    cd CMSSW_10_6_26_PFNano/src
+    eval `scram runtime -sh`
+else
+    scram project -n "CMSSW_10_6_26_PFNano" CMSSW_10_6_26
+    cd CMSSW_10_6_26_PFNano/src
+    eval `scram runtime -sh`
+    git cms-init
+    git cms-rebase-topic DryRun:CMSSW_10_6_19_patch_pfnano
+    git clone git@github.com:DAZSLE/PFNano PhysicsTools/PFNano
+    cd PhysicsTools/PFNano
+    git checkout tags/v2.3 -b v2.3
+    cd $CMSSW_BASE/src
+    scram b
+fi
+cd $CMSSW_BASE/src
+scram b
+cd $TOPDIR
+
+cmsDriver.py \
+    --python_filename "RunIISummer20UL17PFNANOAODSIM_${NAME}_cfg.py" \
+    --mc \
+    --eventcontent NANOAODSIM \
+    --datatier NANOAODSIM \
+    --step NANO \
+    --conditions 106X_mc2017_realistic_v9 \
+    --era Run2_2017,run2_nanoAOD_106Xv2 \
+    --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" \
+    --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \ \
+    --filein "file:RunIISummer20UL17MINIAODSIM_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL17PFNANOAODSIM_$NAME_$JOBINDEX.root" \
+    --customise PhysicsTools/PFNano/ak15/addAK15_cff.setupPFNanoAK15_mc \
+    -n $NEVENTS \
+    --no_exec
+cmsRun "RunIISummer20UL17PFNANOAODSIM_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL17PFNANOAODSIM_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL17PFNANOAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi

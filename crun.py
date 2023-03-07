@@ -22,6 +22,10 @@ MYOMCPATH = os.getenv("MYOMCPATH")
 if not MYOMCPATH:
     raise ValueError("Environment variable MYOMCPATH must be set. Call env.sh.")
 
+known_campaigns = [x for x in os.listdir(os.path.expandvars("$MYOMCPATH")) if x[:3]=="Run"]
+known_campaigns.append("NANOGEN")
+#known_campaigns = ["RunIIFall18GS", "RunIIFall18GSBParking", "RunIISummer20UL17wmLHE", "NANOGEN"]:
+
 def make_proxy(proxy_path):
     os.system("voms-proxy-init -voms cms -out {} -valid 72:00".format(proxy_path))
 
@@ -59,7 +63,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Campaign check
-    if not args.campaign in ["RunIIFall18GS", "RunIIFall18GSBParking", "RunIISummer20UL17wmLHE", "NANOGEN"]:
+    if not args.campaign in known_campaigns:
         raise ValueError("Unknown campaign: {}".format(args.campaign))
 
     # Check fragment exists
@@ -120,7 +124,8 @@ if __name__ == "__main__":
                 print(stderr)
         elif host == "cmsconnect":
             # Use gfal instead of eos
-            gfal_dir = f"gsiftp://cmseos-gridftp.fnal.gov//eos/uscms/{args.outEOS}"
+            #gfal_dir = f"gsiftp://cmseos-gridftp.fnal.gov//eos/uscms/{args.outEOS}" # This no longer works -- cmsconnect doesn't seem to have gridftp installed
+            gfal_dir = f"root://cmseos.fnal.gov/{args.outEOS}"
             import subprocess
             subp = subprocess.Popen(f"gfal-ls {gfal_dir}".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = subp.communicate()

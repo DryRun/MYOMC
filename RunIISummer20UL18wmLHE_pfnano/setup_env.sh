@@ -25,22 +25,28 @@ eval `scram runtime -sh`
 scram b
 cd ../..
 
+
 scram project -n "CMSSW_10_6_17_patch1" CMSSW_10_6_17_patch1
 cd CMSSW_10_6_17_patch1/src
 eval `scram runtime -sh`
 scram b
-cd ../..
+cd ../../
 
-scram project -n "CMSSW_8_0_33_UL" CMSSW_8_0_33_UL
-cd CMSSW_8_0_33_UL/src
+scram project -n "CMSSW_10_2_16_UL" CMSSW_10_2_16_UL
+cd CMSSW_10_2_16_UL/src
 eval `scram runtime -sh`
 scram b
-cd ../..
+cd ../../
 
-
-scram project -n "CMSSW_10_6_25" CMSSW_10_6_25
-cd CMSSW_10_6_25/src
+scram project -n "CMSSW_10_6_26_PFNano" CMSSW_10_6_26
+cd CMSSW_10_6_26_PFNano/src
 eval `scram runtime -sh`
+git cms-init
+git cms-rebase-topic DryRun:CMSSW_10_6_19_patch_pfnano
+git clone git@github.com:DAZSLE/PFNano PhysicsTools/PFNano
+cd PhysicsTools/PFNano
+git checkout tags/v2.3 -b v2.3
+cd $CMSSW_BASE/src
 scram b
 cd ../../
 

@@ -83,25 +83,24 @@ cd $TOPDIR
 #cat $CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py
 
 cmsDriver.py Configuration/GenProduction/python/fragment.py \
-    --python_filename "RunIISummer20UL16wmLHEGEN_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL16wmLHEGENAPV_${NAME}_cfg.py" \
     --eventcontent RAWSIM,LHE \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN,LHE \
-    --fileout "file:RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root" \
-    --conditions 106X_mcRun2_asymptotic_v13 \
+    --fileout "file:RunIISummer20UL16wmLHEGENAPV_$NAME_$JOBINDEX.root" \
+    --conditions 106X_mcRun2_asymptotic_preVFP_v8 \
     --beamspot Realistic25ns13TeV2016Collision \
     --step LHE,GEN \
     --geometry DB:Extended \
-    --era Run2_2016 \
+    --era Run2_2016_HIPM \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed=${RSEED}" \
     --mc \
     -n $NEVENTS 
-
-cmsRun "RunIISummer20UL16wmLHEGEN_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "RunIISummer20UL16wmLHEGENAPV_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16wmLHEGENAPV_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16wmLHEGENAPV_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -123,25 +122,25 @@ scram b
 cd $TOPDIR
 
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16SIM_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL16SIMAPV_${NAME}_cfg.py" \
 	--eventcontent RAWSIM \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	--datatier GEN-SIM \
-    --fileout "file:RunIISummer20UL16SIM_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
+    --fileout "file:RunIISummer20UL16SIMAPV_$NAME_$JOBINDEX.root" \
+	--conditions 106X_mcRun2_asymptotic_preVFP_v8 \
 	--beamspot Realistic25ns13TeV2016Collision \
 	--step SIM \
 	--geometry DB:Extended \
-    --filein "file:RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root" \
-	--era Run2_2016 \
+    --filein "file:RunIISummer20UL16wmLHEGENAPV_$NAME_$JOBINDEX.root" \
+	--era Run2_2016_HIPM \
 	--runUnscheduled \
 	--no_exec \
 	--mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
-cmsRun "RunIISummer20UL16SIM_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16SIM_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16SIM_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "RunIISummer20UL16SIMAPV_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16SIMAPV_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16SIMAPV_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -149,27 +148,27 @@ fi
 # DIGIPremix
 cd $TOPDIR
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16DIGIPremix_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL16DIGIPremixAPV_${NAME}_cfg.py" \
 	--eventcontent PREMIXRAW \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	--datatier GEN-SIM-DIGI \
-    --filein "file:RunIISummer20UL16SIM_$NAME_$JOBINDEX.root" \
-    --fileout "file:RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" \
+    --filein "file:RunIISummer20UL16SIMAPV_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL16DIGIPremixAPV_$NAME_$JOBINDEX.root" \
     --pileup_input "$PILEUP_FILELIST" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
+	--conditions 106X_mcRun2_asymptotic_preVFP_v8 \
 	--step DIGI,DATAMIX,L1,DIGI2RAW \
 	--procModifiers premix_stage2 \
 	--geometry DB:Extended \
 	--datamix PreMix \
-	--era Run2_2016 \
+	--era Run2_2016_HIPM \
 	--runUnscheduled \
 	--no_exec \
 	--mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
-cmsRun "RunIISummer20UL16DIGIPremix_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "RunIISummer20UL16DIGIPremixAPV_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16DIGIPremixAPV_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16DIGIPremixAPV_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -191,25 +190,26 @@ scram b
 cd $TOPDIR
 
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16HLT_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL16HLTAPV_${NAME}_cfg.py" \
     --eventcontent RAWSIM \
-    ---inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
-    ---outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
+    --inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
     --datatier GEN-SIM-RAW \
-    --filein "file:RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" \
-    --fileout "file:RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" \
+    --filein "file:RunIISummer20UL16DIGIPremixAPV_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL16HLTAPV_$NAME_$JOBINDEX.root" \
     --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
-    ---customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
+    --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
     --step HLT:25ns15e33_v4 \
     --geometry DB:Extended \
     --era Run2_2016 \
     --no_exec \
     --mc \
     -n $NEVENTS
-cmsRun "RunIISummer20UL16HLT_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16HLT_$NAME_$JOBINDEX.root not found. Exiting."
+
+cmsRun "RunIISummer20UL16HLTAPV_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16HLTAPV_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16HLTAPV_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -223,24 +223,24 @@ scram b
 cd $TOPDIR
 
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16RECO_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL16RECOAPV_${NAME}_cfg.py" \
 	--eventcontent AODSIM \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	--datatier AODSIM \
-    --filein "file:RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" \
-    --fileout "file:RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
+    --filein "file:RunIISummer20UL16HLTAPV_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL16RECOAPV_$NAME_$JOBINDEX.root" \
+	--conditions 106X_mcRun2_asymptotic_preVFP_v8 \
 	--step RAW2DIGI,L1Reco,RECO,RECOSIM \
 	--geometry DB:Extended \
-	--era Run2_2016 \
+	--era Run2_2016_HIPM \
 	--runUnscheduled \
 	--no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
 	--mc \
     -n $NEVENTS 
-cmsRun "RunIISummer20UL16RECO_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16RECO_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "RunIISummer20UL16RECOAPV_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16RECOAPV_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16RECOAPV_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -262,24 +262,69 @@ scram b
 cd $TOPDIR
 
 cmsDriver.py  \
-    --python_filename "RunIISummer20UL16MINIAODSIM_${NAME}_cfg.py" \
+    --python_filename "RunIISummer20UL16MINIAODSIMAPV_${NAME}_cfg.py" \
 	--eventcontent MINIAODSIM \
 	--customise Configuration/DataProcessing/Utils.addMonitoring \
 	--datatier MINIAODSIM \
-    --filein "file:RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" \
-    --fileout "file:RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v17 \
+    --filein "file:RunIISummer20UL16RECOAPV_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL16MINIAODSIMAPV_$NAME_$JOBINDEX.root" \
+	--conditions 106X_mcRun2_asymptotic_preVFP_v11 \
 	--step PAT \
 	--procModifiers run2_miniAOD_UL \
 	--geometry DB:Extended \
-	--era Run2_2016 \
+	--era Run2_2016_HIPM \
 	--runUnscheduled \
 	--no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
 	--mc \
-    -n $NEVENTS    
-cmsRun "RunIISummer20UL16MINIAODSIM_${NAME}_cfg.py"
-if [ ! -f "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" ]; then
-    echo "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
+    -n $NEVENTS
+cmsRun "RunIISummer20UL16MINIAODSIMAPV_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16MINIAODSIMAPV_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16MINIAODSIMAPV_$NAME_$JOBINDEX.root not found. Exiting."
+    return 1
+fi
+
+
+# PFNano
+export SCRAM_ARCH=slc7_amd64_gcc700
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r CMSSW_10_6_26_PFNano/src ] ; then
+    echo release CMSSW_10_6_26_PFNano already exists
+    cd CMSSW_10_6_26_PFNano/src
+    eval `scram runtime -sh`
+else
+    scram project -n "CMSSW_10_6_26_PFNano" CMSSW_10_6_26
+    cd CMSSW_10_6_26_PFNano/src
+    eval `scram runtime -sh`
+    git cms-init
+    git cms-rebase-topic DryRun:CMSSW_10_6_19_patch_pfnano
+    git clone git@github.com:DAZSLE/PFNano PhysicsTools/PFNano
+    cd PhysicsTools/PFNano
+    git checkout tags/v2.3 -b v2.3
+    cd $CMSSW_BASE/src
+    scram b
+fi
+cd $CMSSW_BASE/src
+scram b
+cd $TOPDIR
+
+cmsDriver.py \
+    --python_filename "RunIISummer20UL16PFNANOAODSIMAPV_${NAME}_cfg.py" \
+    --mc \
+    --eventcontent NANOAODSIM \
+    --datatier NANOAODSIM \
+    --step NANO \
+    --conditions 106X_mcRun2_asymptotic_preVFP_v11 \
+    --era Run2_2016_HIPM,run2_nanoAOD_106Xv2 \
+    --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" \
+    --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
+    --filein "file:RunIISummer20UL16MINIAODSIMAPV_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL16PFNANOAODSIMAPV_$NAME_$JOBINDEX.root" \
+    --customise PhysicsTools/PFNano/ak15/addAK15_cff.setupPFNanoAK15_mc \
+    -n $NEVENTS \
+    --no_exec
+cmsRun "RunIISummer20UL16PFNANOAODSIMAPV_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16PFNANOAODSIMAPV_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16PFNANOAODSIMAPV_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi

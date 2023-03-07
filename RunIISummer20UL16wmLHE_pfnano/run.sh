@@ -193,14 +193,14 @@ cd $TOPDIR
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16HLT_${NAME}_cfg.py" \
     --eventcontent RAWSIM \
-    ---inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
-    ---outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
+    --inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
+    --outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN-SIM-RAW \
     --filein "file:RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" \
     --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
-    ---customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
+    --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
     --step HLT:25ns15e33_v4 \
     --geometry DB:Extended \
     --era Run2_2016 \
@@ -281,5 +281,50 @@ cmsDriver.py  \
 cmsRun "RunIISummer20UL16MINIAODSIM_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" ]; then
     echo "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
+    return 1
+fi
+
+
+# PFNano
+export SCRAM_ARCH=slc7_amd64_gcc700
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r CMSSW_10_6_26_PFNano/src ] ; then
+    echo release CMSSW_10_6_26_PFNano already exists
+    cd CMSSW_10_6_26_PFNano/src
+    eval `scram runtime -sh`
+else
+    scram project -n "CMSSW_10_6_26_PFNano" CMSSW_10_6_26
+    cd CMSSW_10_6_26_PFNano/src
+    eval `scram runtime -sh`
+    git cms-init
+    git cms-rebase-topic DryRun:CMSSW_10_6_19_patch_pfnano
+    git clone git@github.com:DAZSLE/PFNano PhysicsTools/PFNano
+    cd PhysicsTools/PFNano
+    git checkout tags/v2.3 -b v2.3
+    cd $CMSSW_BASE/src
+    scram b
+fi
+cd $CMSSW_BASE/src
+scram b
+cd $TOPDIR
+
+cmsDriver.py \
+    --python_filename "RunIISummer20UL16PFNANOAODSIM_${NAME}_cfg.py" \
+    --mc \
+    --eventcontent NANOAODSIM \
+    --datatier NANOAODSIM \
+    --step NANO \
+    --conditions 106X_mcRun2_asymptotic_v17 \
+    --era Run2_2016,run2_nanoAOD_106Xv2 \
+    --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" \
+    --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \ \
+    --filein "file:RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL16PFNANOAODSIM_$NAME_$JOBINDEX.root" \
+    --customise PhysicsTools/PFNano/ak15/addAK15_cff.setupPFNanoAK15_mc \
+    -n $NEVENTS \
+    --no_exec
+cmsRun "RunIISummer20UL16PFNANOAODSIM_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16PFNANOAODSIM_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16PFNANOAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
