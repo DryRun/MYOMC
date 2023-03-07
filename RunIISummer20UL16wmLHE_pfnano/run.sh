@@ -35,14 +35,13 @@ if [ -z "$4" ]; then
 else
     JOBINDEX=$4
 fi
-RSEED=$((JOBINDEX + 1001))
-
 
 if [ -z "$5" ]; then
     MAX_NTHREADS=8
 else
     MAX_NTHREADS=$5
 fi
+RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed
 
 if [ -z "$6" ]; then
     PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/RunIISummer20ULPrePremix-UL16_106X_mcRun2_asymptotic_v13-v1/PREMIX" 
@@ -194,14 +193,14 @@ cd $TOPDIR
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16HLT_${NAME}_cfg.py" \
     --eventcontent RAWSIM \
-    ---inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
-    ---outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
+    --inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
+    --outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN-SIM-RAW \
     --filein "file:RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" \
     --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
-    ---customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
+    --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
     --step HLT:25ns15e33_v4 \
     --geometry DB:Extended \
     --era Run2_2016 \
@@ -322,6 +321,7 @@ cmsDriver.py \
     --filein "file:RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16PFNANOAODSIM_$NAME_$JOBINDEX.root" \
     --customise PhysicsTools/PFNano/ak15/addAK15_cff.setupPFNanoAK15_mc \
+    -n $NEVENTS \
     --no_exec
 cmsRun "RunIISummer20UL16PFNANOAODSIM_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL16PFNANOAODSIM_$NAME_$JOBINDEX.root" ]; then

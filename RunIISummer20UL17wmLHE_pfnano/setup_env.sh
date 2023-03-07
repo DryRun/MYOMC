@@ -52,3 +52,5 @@ cd ../../
 tar -czvf env.tar.gz ./CMSSW*
 mv env.tar.gz ..
 cd ..
+
+eval `scram unsetenv -sh`

@@ -35,14 +35,13 @@ if [ -z "$4" ]; then
 else
     JOBINDEX=$4
 fi
-RSEED=$((JOBINDEX + 1001))
-
 
 if [ -z "$5" ]; then
     MAX_NTHREADS=8
 else
     MAX_NTHREADS=$5
 fi
+RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed
 
 if [ -z "$6" ]; then
     PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/RunIISummer20ULPrePremix-UL16_106X_mcRun2_asymptotic_v13-v1/PREMIX" 
@@ -322,6 +321,7 @@ cmsDriver.py \
     --filein "file:RunIISummer20UL16MINIAODSIMAPV_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16PFNANOAODSIMAPV_$NAME_$JOBINDEX.root" \
     --customise PhysicsTools/PFNano/ak15/addAK15_cff.setupPFNanoAK15_mc \
+    -n $NEVENTS \
     --no_exec
 cmsRun "RunIISummer20UL16PFNANOAODSIMAPV_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL16PFNANOAODSIMAPV_$NAME_$JOBINDEX.root" ]; then

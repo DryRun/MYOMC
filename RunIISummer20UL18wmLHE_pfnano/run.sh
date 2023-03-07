@@ -35,14 +35,13 @@ if [ -z "$4" ]; then
 else
     JOBINDEX=$4
 fi
-RSEED=$((JOBINDEX + 1001))
-
 
 if [ -z "$5" ]; then
     MAX_NTHREADS=8
 else
     MAX_NTHREADS=$5
 fi
+RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed. The extra *4 is a paranoia factor.
 
 if [ -z "$6" ]; then
     PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/RunIISummer20ULPrePremix-UL18_106X_upgrade2018_realistic_v11_L1v1-v2/PREMIX" 
@@ -313,11 +312,12 @@ cmsDriver.py \
     --step NANO \
     --conditions 106X_upgrade2018_realistic_v16_L1v1 \
     --era Run2_2018,run2_nanoAOD_106Xv2 \
-    ---customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" \
+    --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \ \
     --filein "file:RunIISummer20UL18MINIAODSIM_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL18PFNANOAODSIM_$NAME_$JOBINDEX.root" \
     --customise PhysicsTools/PFNano/ak15/addAK15_cff.setupPFNanoAK15_mc \
+    -n $NEVENTS \
     --no_exec
 cmsRun "RunIISummer20UL18PFNANOAODSIM_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL18PFNANOAODSIM_$NAME_$JOBINDEX.root" ]; then
