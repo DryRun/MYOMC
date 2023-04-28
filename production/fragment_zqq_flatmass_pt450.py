@@ -1,6 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 import os
-
 gridpack_abspath = os.path.expandvars("$_CONDOR_SCRATCH_DIR/VectorZPrimeAToQQA_flatmass_pt400_rhocut_slc7_amd64_gcc900_CMSSW_12_0_2_tarball.tar.xz")
 
 externalLHEProducer = cms.EDProducer("ExternalLHEProducer",

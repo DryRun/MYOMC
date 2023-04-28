@@ -1,7 +1,9 @@
 import FWCore.ParameterSet.Config as cms
+import os
+gridpack_abspath = os.path.expandvars("$_CONDOR_SCRATCH_DIR/VectorZPrimeAToQQA_flatmass_pt140_rhocut_slc7_amd64_gcc900_CMSSW_12_0_2_tarball.tar.xz")
 
 externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
-    args = cms.vstring('/cvmfs/cms.cern.ch/phys_generator/gridpacks/UL/13TeV/madgraph/V5_2.6.5/ZPrimeAToQQA_flat/VectorZPrimeAToQQA_M175_gq1p5_LO_flat_rhocut_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz'),
+    args = cms.vstring(gridpack_abspath),
     nEvents = cms.untracked.uint32(5000),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),
