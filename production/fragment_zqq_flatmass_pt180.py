@@ -33,6 +33,32 @@ generator = cms.EDFilter("Pythia8ConcurrentHadronizerFilter",
     )
 )
 
+genParticlesForFilter = cms.EDProducer(
+    "GenParticleProducer",
+    saveBarCodes=cms.untracked.bool(True),
+    src=cms.InputTag("generator", "unsmeared"),
+    abortOnUnknownPDGCode=cms.untracked.bool(False)
+)
+
+genfilter = cms.EDFilter(
+    "GenParticleSelector",
+    src = cms.InputTag("genParticlesForFilter"),
+    cut = cms.string(' && '.join([
+        '(pdgId==55)',#Added photon pt cut
+        'pt>180.',
+        'isLastCopy()',
+    ]))
+)
+
+gencount = cms.EDFilter(
+    "CandViewCountFilter",
+    src = cms.InputTag("genfilter"),
+    minNumber = cms.uint32(1)
+)
+
+ProductionFilterSequence = cms.Sequence(
+    generator * (genParticlesForFilter + genfilter + gencount)
+)
 
 
 # Link to generator fragment:

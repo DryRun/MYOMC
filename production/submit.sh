@@ -1,7 +1,7 @@
 #!/bin/bash
 python3 ../crun.py VectorZPrimeGammaToQQGamma_flatmass_pt180_2017 fragment_zqq_flatmass_pt180.py RunIISummer20UL17wmLHE_pfnano \
     -e -p -f \
-    --nevents_job 2000 \
+    --nevents_job 3000 \
     --njobs 5000 \
     --keepNANO \
     --extra_files VectorZPrimeAToQQA_flatmass_pt140_rhocut_slc7_amd64_gcc900_CMSSW_12_0_2_tarball.tar.xz \
@@ -10,7 +10,7 @@ python3 ../crun.py VectorZPrimeGammaToQQGamma_flatmass_pt180_2017 fragment_zqq_f
 
 python3 ../crun.py VectorZPrimeGammaToQQGamma_flatmass_pt450_2017 fragment_zqq_flatmass_pt450.py RunIISummer20UL17wmLHE_pfnano \
     -e -p -f \
-    --nevents_job 2000 \
+    --nevents_job 3000 \
     --njobs 5000 \
     --keepNANO \
     --extra_files VectorZPrimeAToQQA_flatmass_pt400_rhocut_slc7_amd64_gcc900_CMSSW_12_0_2_tarball.tar.xz \
@@ -19,7 +19,7 @@ python3 ../crun.py VectorZPrimeGammaToQQGamma_flatmass_pt450_2017 fragment_zqq_f
 
 python3 ../crun.py VectorZPrimeGammaToQQGamma_flatmass_pt180_2018 fragment_zqq_flatmass_pt180.py RunIISummer20UL18wmLHE_pfnano \
     -e -p -f \
-    --nevents_job 2000 \
+    --nevents_job 3000 \
     --njobs 5000 \
     --keepNANO \
     --extra_files VectorZPrimeAToQQA_flatmass_pt140_rhocut_slc7_amd64_gcc900_CMSSW_12_0_2_tarball.tar.xz \
@@ -28,7 +28,7 @@ python3 ../crun.py VectorZPrimeGammaToQQGamma_flatmass_pt180_2018 fragment_zqq_f
 
 python3 ../crun.py VectorZPrimeGammaToQQGamma_flatmass_pt450_2018 fragment_zqq_flatmass_pt450.py RunIISummer20UL18wmLHE_pfnano \
     -e -p -f \
-    --nevents_job 2000 \
+    --nevents_job 3000 \
     --njobs 5000 \
     --keepNANO \
     --extra_files VectorZPrimeAToQQA_flatmass_pt400_rhocut_slc7_amd64_gcc900_CMSSW_12_0_2_tarball.tar.xz \
