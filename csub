@@ -91,6 +91,8 @@ top_script_name = "condor_run_" + timestamp + ".sh"
 top_script = open(top_script_name, 'w')
 top_script.write("#!/bin/bash\n")
 top_script.write("start=`date +%s`\n")
+top_script.write("export HOME=$_CONDOR_SCRATCH_DIR\n")
+top_script.write("echo \"Setting HOME to $_CONDOR_SCRATCH_DIR\"\n")
 for env_name, env_value in env_to_transfer.items():
 	top_script.write("export " + env_name + "=" + env_value + "\n")
 #if args.cmssw_src:
@@ -144,6 +146,7 @@ else:
 submission_file = open(submission_file_name, 'w')
 submission_file.write("executable = " + top_script_name + "\n")
 submission_file.write("request_memory = " + str(args.mem) + "\n")
+submission_file.write("use_x509userproxy = true\n")
 submission_file.write("transfer_executable = true\n")
 submission_file.write("notification = never\n")
 submission_file.write("getenv = false\n")
