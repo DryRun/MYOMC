@@ -224,12 +224,12 @@ if __name__ == "__main__":
                 run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
             if args.keepNANO:
-                run_script.write("for FILENAME in ./*NanoAOD*root; do\n")
+                run_script.write("for FILENAME in ./*NANOAOD*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
                 run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
             if args.keepMINI:
-                run_script.write("for FILENAME in ./*MiniAOD*root; do\n")
+                run_script.write("for FILENAME in ./*MINIAOD*root; do\n")
                 run_script.write("   echo \"Copying $FILENAME\"\n")
                 run_script.write("   env -i bash -l -c \"export X509_USER_PROXY=$_CONDOR_SCRATCH_DIR/x509up; gfal-copy -f -p -v -t 180 file://$PWD/$FILENAME '{}/$FILENAME' 2>&1\"\n".format(args.gfalcp))
                 run_script.write("done\n")
