@@ -43,6 +43,12 @@ eval `scram runtime -sh`
 scram b
 cd ../../
 
+scram project -n "CMSSW_10_6_32_patch1" CMSSW_10_6_32_patch1
+cd CMSSW_10_6_32_patch1/src
+eval `scram runtime -sh`
+scram b
+cd ../../
+
 tar -czvf env.tar.gz ./CMSSW*
 mv env.tar.gz ..
 cd ..

@@ -37,9 +37,14 @@ eval `scram runtime -sh`
 scram b
 cd ../..
 
+scram project -n "CMSSW_10_6_20" CMSSW_10_6_20
+cd CMSSW_10_6_20/src
+eval `scram runtime -sh`
+scram b
+cd ../../
 
-scram project -n "CMSSW_10_6_25" CMSSW_10_6_25
-cd CMSSW_10_6_25/src
+scram project -n "CMSSW_10_6_32_patch1" CMSSW_10_6_32_patch1
+cd CMSSW_10_6_32_patch1/src
 eval `scram runtime -sh`
 scram b
 cd ../../

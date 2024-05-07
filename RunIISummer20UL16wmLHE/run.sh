@@ -9,6 +9,8 @@
 # Make sure to run setup_env.sh first to create a CMSSW tarball (have to patch the DR step to avoid taking forever to uniqify the list of 300K pileup files)
 echo $@
 
+cmssw-el7
+
 if [ -z "$1" ]; then
     echo "Argument 1 (name of job) is mandatory."
     return 1
@@ -60,13 +62,13 @@ TOPDIR=$PWD
 # wmLHE
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_10_6_28_patch1/src ] ; then 
-    echo release CMSSW_10_6_28_patch1 already exists
-    cd CMSSW_10_6_28_patch1/src
+if [ -r CMSSW_10_6_40/src ] ; then 
+    echo release CMSSW_10_6_40 already exists
+    cd CMSSW_10_6_40/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_10_6_28_patch1" CMSSW_10_6_28_patch1
-    cd CMSSW_10_6_28_patch1/src
+    scram project -n "CMSSW_10_6_40" CMSSW_10_6_40
+    cd CMSSW_10_6_40/src
     eval `scram runtime -sh`
 fi
 
@@ -124,19 +126,19 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16SIM_${NAME}_cfg.py" \
-	--eventcontent RAWSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier GEN-SIM \
+    --eventcontent RAWSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier GEN-SIM \
     --fileout "file:RunIISummer20UL16SIM_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
-	--beamspot Realistic25ns13TeV2016Collision \
-	--step SIM \
-	--geometry DB:Extended \
+    --conditions 106X_mcRun2_asymptotic_v13 \
+    --beamspot Realistic25ns13TeV2016Collision \
+    --step SIM \
+    --geometry DB:Extended \
     --filein "file:RunIISummer20UL16wmLHEGEN_$NAME_$JOBINDEX.root" \
-	--era Run2_2016 \
-	--runUnscheduled \
-	--no_exec \
-	--mc \
+    --era Run2_2016 \
+    --runUnscheduled \
+    --no_exec \
+    --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
 cmsRun "RunIISummer20UL16SIM_${NAME}_cfg.py"
@@ -150,21 +152,21 @@ fi
 cd $TOPDIR
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16DIGIPremix_${NAME}_cfg.py" \
-	--eventcontent PREMIXRAW \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier GEN-SIM-DIGI \
+    --eventcontent PREMIXRAW \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier GEN-SIM-DIGI \
     --filein "file:RunIISummer20UL16SIM_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" \
     --pileup_input "$PILEUP_FILELIST" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
-	--step DIGI,DATAMIX,L1,DIGI2RAW \
-	--procModifiers premix_stage2 \
-	--geometry DB:Extended \
-	--datamix PreMix \
-	--era Run2_2016 \
-	--runUnscheduled \
-	--no_exec \
-	--mc \
+    --conditions 106X_mcRun2_asymptotic_v13 \
+    --step DIGI,DATAMIX,L1,DIGI2RAW \
+    --procModifiers premix_stage2 \
+    --geometry DB:Extended \
+    --datamix PreMix \
+    --era Run2_2016 \
+    --runUnscheduled \
+    --no_exec \
+    --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
 cmsRun "RunIISummer20UL16DIGIPremix_${NAME}_cfg.py"
@@ -177,13 +179,13 @@ fi
 # HLT
 export SCRAM_ARCH=slc7_amd64_gcc630
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_8_0_33_UL/src ] ; then
-    echo release CMSSW_8_0_33_UL already exists
-    cd CMSSW_8_0_33_UL/src
+if [ -r CMSSW_8_0_36_UL_patch2/src ] ; then
+    echo release CMSSW_8_0_36_UL_patch2 already exists
+    cd CMSSW_8_0_36_UL_patch2/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_8_0_33_UL" CMSSW_8_0_33_UL
-    cd CMSSW_8_0_33_UL/src
+    scram project -n "CMSSW_8_0_36_UL_patch2" CMSSW_8_0_36_UL_patch2
+    cd CMSSW_8_0_36_UL_patch2/src
     eval `scram runtime -sh`
 fi
 cd $CMSSW_BASE/src
@@ -193,14 +195,14 @@ cd $TOPDIR
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16HLT_${NAME}_cfg.py" \
     --eventcontent RAWSIM \
-    ---inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
-    ---outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
+    --inputCommands "keep *","drop *_*_BMTF_*","drop *PixelFEDChannel*_*_*_*" \
+    --outputCommand "keep *_mix_*_*,keep *_genPUProtons_*_*" \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN-SIM-RAW \
     --filein "file:RunIISummer20UL16DIGIPremix_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" \
     --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 \
-    ---customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
+    --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' \
     --step HLT:25ns15e33_v4 \
     --geometry DB:Extended \
     --era Run2_2016 \
@@ -224,19 +226,19 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16RECO_${NAME}_cfg.py" \
-	--eventcontent AODSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier AODSIM \
+    --eventcontent AODSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier AODSIM \
     --filein "file:RunIISummer20UL16HLT_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v13 \
-	--step RAW2DIGI,L1Reco,RECO,RECOSIM \
-	--geometry DB:Extended \
-	--era Run2_2016 \
-	--runUnscheduled \
-	--no_exec \
+    --conditions 106X_mcRun2_asymptotic_v13 \
+    --step RAW2DIGI,L1Reco,RECO,RECOSIM \
+    --geometry DB:Extended \
+    --era Run2_2016 \
+    --runUnscheduled \
+    --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
-	--mc \
+    --mc \
     -n $NEVENTS 
 cmsRun "RunIISummer20UL16RECO_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" ]; then
@@ -263,23 +265,61 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16MINIAODSIM_${NAME}_cfg.py" \
-	--eventcontent MINIAODSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier MINIAODSIM \
+    --eventcontent MINIAODSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier MINIAODSIM \
     --filein "file:RunIISummer20UL16RECO_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_v17 \
-	--step PAT \
-	--procModifiers run2_miniAOD_UL \
-	--geometry DB:Extended \
-	--era Run2_2016 \
-	--runUnscheduled \
-	--no_exec \
+    --conditions 106X_mcRun2_asymptotic_v17 \
+    --step PAT \
+    --procModifiers run2_miniAOD_UL \
+    --geometry DB:Extended \
+    --era Run2_2016 \
+    --runUnscheduled \
+    --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
-	--mc \
+    --mc \
     -n $NEVENTS    
 cmsRun "RunIISummer20UL16MINIAODSIM_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" ]; then
     echo "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
+    return 1
+fi
+
+
+# PFNano
+export SCRAM_ARCH=slc7_amd64_gcc700
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r CMSSW_10_6_32_patch1/src ] ; then
+    echo release CMSSW_10_6_32_patch1 already exists
+    cd CMSSW_10_6_32_patch1/src
+    eval `scram runtime -sh`
+else
+    cmsrel CMSSW_10_6_32_patch1
+    cd CMSSW_10_6_32_patch1/src
+    eval `scram runtime -sh`
+fi
+cd $CMSSW_BASE/src
+scram b
+cd $TOPDIR
+
+cmsDriver.py  \
+    --python_filename "RunIISummer20UL16NANOAODSIM_${NAME}_cfg.py" \
+    --filein "file:RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" \
+    --fileout "file:RunIISummer20UL16NANOAODSIM_$NAME_$JOBINDEX.root" \
+    --eventcontent NANOAODSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --customise_commands="process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))" \
+    --datatier NANOAODSIM \
+    --conditions 106X_mcRun2_asymptotic_v17 \
+    --step NANO \
+    --era Run2_2016,run2_nanoAOD_106Xv2 \
+    --no_exec \
+    --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \ \
+    --mc \
+    -n $EVENTS
+cmsRun "RunIISummer20UL16NANOAODSIM_${NAME}_cfg.py"
+if [ ! -f "RunIISummer20UL16NANOAODSIM_$NAME_$JOBINDEX.root" ]; then
+    echo "RunIISummer20UL16NANOAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
