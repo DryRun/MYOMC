@@ -35,7 +35,6 @@ if [ -z "$4" ]; then
 else
     JOBINDEX=$4
 fi
-RSEED=$((JOBINDEX + 1001))
 
 
 if [ -z "$5" ]; then
@@ -43,6 +42,9 @@ if [ -z "$5" ]; then
 else
     MAX_NTHREADS=$5
 fi
+
+RSEED=$((JOBINDEX * MAX_NTHREADS * 100 + 1001)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed
+
 
 echo "Fragment=$FRAGMENT"
 echo "Job name=$NAME"
@@ -54,6 +56,7 @@ TOPDIR=$PWD
 # NANOGEN
 # Setup CMSSW and merge NANOGEN stuff
 #export SCRAM_ARCH=slc6_amd64_gcc700
+export SCRAM_ARCH=slc7_amd64_gcc820
 if [ -r CMSSW_10_6_22_NANOGEN ] ; then
     echo release CMSSW_10_6_22_NANOGEN already exists
     cd CMSSW_10_6_22_NANOGEN/src
@@ -98,7 +101,10 @@ cmsDriver.py Configuration/GenProduction/python/fragment.py \
     --no_exec \
     --mc \
     --nThreads $MAX_NTHREADS \
-    --customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed=${RSEED}" \
+    --customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\n\
+process.RandomNumberGeneratorService.externalLHEProducer.initialSeed=${RSEED}\\n\
+process.genParticleTable.variables.mass.precision=cms.untracked.int32(-1)\\n\
+process.genJetTable.variables.mass.precision=cms.untracked.int32(-1)\\n" \
     -n $NEVENTS
 
 cmsRun "NANOGEN_${NAME}_cfg.py"
