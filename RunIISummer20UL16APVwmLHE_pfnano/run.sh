@@ -60,13 +60,13 @@ TOPDIR=$PWD
 # wmLHE
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_10_6_28_patch1/src ] ; then 
-    echo release CMSSW_10_6_28_patch1 already exists
-    cd CMSSW_10_6_28_patch1/src
+if [ -r CMSSW_10_6_40/src ] ; then 
+    echo release CMSSW_10_6_40 already exists
+    cd CMSSW_10_6_40/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_10_6_28_patch1" CMSSW_10_6_28_patch1
-    cd CMSSW_10_6_28_patch1/src
+    scram project -n "CMSSW_10_6_40" CMSSW_10_6_40
+    cd CMSSW_10_6_40/src
     eval `scram runtime -sh`
 fi
 
@@ -123,19 +123,19 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16SIMAPV_${NAME}_cfg.py" \
-	--eventcontent RAWSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier GEN-SIM \
+    --eventcontent RAWSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier GEN-SIM \
     --fileout "file:RunIISummer20UL16SIMAPV_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_preVFP_v8 \
-	--beamspot Realistic25ns13TeV2016Collision \
-	--step SIM \
-	--geometry DB:Extended \
+    --conditions 106X_mcRun2_asymptotic_preVFP_v8 \
+    --beamspot Realistic25ns13TeV2016Collision \
+    --step SIM \
+    --geometry DB:Extended \
     --filein "file:RunIISummer20UL16wmLHEGENAPV_$NAME_$JOBINDEX.root" \
-	--era Run2_2016_HIPM \
-	--runUnscheduled \
-	--no_exec \
-	--mc \
+    --era Run2_2016_HIPM \
+    --runUnscheduled \
+    --no_exec \
+    --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
 cmsRun "RunIISummer20UL16SIMAPV_${NAME}_cfg.py"
@@ -149,21 +149,21 @@ fi
 cd $TOPDIR
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16DIGIPremixAPV_${NAME}_cfg.py" \
-	--eventcontent PREMIXRAW \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier GEN-SIM-DIGI \
+    --eventcontent PREMIXRAW \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier GEN-SIM-DIGI \
     --filein "file:RunIISummer20UL16SIMAPV_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16DIGIPremixAPV_$NAME_$JOBINDEX.root" \
     --pileup_input "$PILEUP_FILELIST" \
-	--conditions 106X_mcRun2_asymptotic_preVFP_v8 \
-	--step DIGI,DATAMIX,L1,DIGI2RAW \
-	--procModifiers premix_stage2 \
-	--geometry DB:Extended \
-	--datamix PreMix \
-	--era Run2_2016_HIPM \
-	--runUnscheduled \
-	--no_exec \
-	--mc \
+    --conditions 106X_mcRun2_asymptotic_preVFP_v8 \
+    --step DIGI,DATAMIX,L1,DIGI2RAW \
+    --procModifiers premix_stage2 \
+    --geometry DB:Extended \
+    --datamix PreMix \
+    --era Run2_2016_HIPM \
+    --runUnscheduled \
+    --no_exec \
+    --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
 cmsRun "RunIISummer20UL16DIGIPremixAPV_${NAME}_cfg.py"
@@ -176,13 +176,13 @@ fi
 # HLT
 export SCRAM_ARCH=slc7_amd64_gcc630
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_8_0_33_UL/src ] ; then
-    echo release CMSSW_8_0_33_UL already exists
-    cd CMSSW_8_0_33_UL/src
+if [ -r CMSSW_8_0_36_UL_patch2/src ] ; then
+    echo release CMSSW_8_0_36_UL_patch2 already exists
+    cd CMSSW_8_0_36_UL_patch2/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_8_0_33_UL" CMSSW_8_0_33_UL
-    cd CMSSW_8_0_33_UL/src
+    scram project -n "CMSSW_8_0_36_UL_patch2" CMSSW_8_0_36_UL_patch2
+    cd CMSSW_8_0_36_UL_patch2/src
     eval `scram runtime -sh`
 fi
 cd $CMSSW_BASE/src
@@ -224,19 +224,19 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16RECOAPV_${NAME}_cfg.py" \
-	--eventcontent AODSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier AODSIM \
+    --eventcontent AODSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier AODSIM \
     --filein "file:RunIISummer20UL16HLTAPV_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16RECOAPV_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_preVFP_v8 \
-	--step RAW2DIGI,L1Reco,RECO,RECOSIM \
-	--geometry DB:Extended \
-	--era Run2_2016_HIPM \
-	--runUnscheduled \
-	--no_exec \
+    --conditions 106X_mcRun2_asymptotic_preVFP_v8 \
+    --step RAW2DIGI,L1Reco,RECO,RECOSIM \
+    --geometry DB:Extended \
+    --era Run2_2016_HIPM \
+    --runUnscheduled \
+    --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
-	--mc \
+    --mc \
     -n $NEVENTS 
 cmsRun "RunIISummer20UL16RECOAPV_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL16RECOAPV_$NAME_$JOBINDEX.root" ]; then
@@ -263,20 +263,20 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL16MINIAODSIMAPV_${NAME}_cfg.py" \
-	--eventcontent MINIAODSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier MINIAODSIM \
+    --eventcontent MINIAODSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier MINIAODSIM \
     --filein "file:RunIISummer20UL16RECOAPV_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL16MINIAODSIMAPV_$NAME_$JOBINDEX.root" \
-	--conditions 106X_mcRun2_asymptotic_preVFP_v11 \
-	--step PAT \
-	--procModifiers run2_miniAOD_UL \
-	--geometry DB:Extended \
-	--era Run2_2016_HIPM \
-	--runUnscheduled \
-	--no_exec \
+    --conditions 106X_mcRun2_asymptotic_preVFP_v11 \
+    --step PAT \
+    --procModifiers run2_miniAOD_UL \
+    --geometry DB:Extended \
+    --era Run2_2016_HIPM \
+    --runUnscheduled \
+    --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
-	--mc \
+    --mc \
     -n $NEVENTS
 cmsRun "RunIISummer20UL16MINIAODSIMAPV_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL16MINIAODSIMAPV_$NAME_$JOBINDEX.root" ]; then

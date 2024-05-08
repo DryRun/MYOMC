@@ -20,7 +20,7 @@ cd env
 scram project -n "CMSSW_10_6_30_patch1_NANOGEN" CMSSW_10_6_30_patch1
 cd CMSSW_10_6_30_patch1_NANOGEN/src
 eval `scram runtime -sh`
-git cms-init
+#git cms-init
 #git cms-merge-topic DryRun:CMSSW_10_6_22_NANOGEN-NANOGEN
 scram b -j8
 cd ../../

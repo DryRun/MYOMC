@@ -9,6 +9,9 @@
 # Make sure to run setup_env.sh first to create a CMSSW tarball (have to patch the DR step to avoid taking forever to uniqify the list of 300K pileup files)
 echo $@
 
+echo "In run.sh, the OS is:"
+cat /etc/os-release
+
 if [ -z "$1" ]; then
     echo "Argument 1 (name of job) is mandatory."
     return 1
@@ -60,13 +63,13 @@ TOPDIR=$PWD
 # wmLHE
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_10_6_28_patch1/src ] ; then 
-    echo release CMSSW_10_6_28_patch1 already exists
-    cd CMSSW_10_6_28_patch1/src
+if [ -r CMSSW_10_6_40/src ] ; then 
+    echo release CMSSW_10_6_40 already exists
+    cd CMSSW_10_6_40/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_10_6_28_patch1" CMSSW_10_6_28_patch1
-    cd CMSSW_10_6_28_patch1/src
+    scram project -n "CMSSW_10_6_40" CMSSW_10_6_40
+    cd CMSSW_10_6_40/src
     eval `scram runtime -sh`
 fi
 
@@ -123,19 +126,19 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL18SIM_${NAME}_cfg.py" \
-	--eventcontent RAWSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier GEN-SIM \
+    --eventcontent RAWSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier GEN-SIM \
     --fileout "file:RunIISummer20UL18SIM_$NAME_$JOBINDEX.root" \
-	--conditions 106X_upgrade2018_realistic_v11_L1v1 \
-	--beamspot Realistic25ns13TeVEarly2018Collision \
-	--step SIM \
-	--geometry DB:Extended \
+    --conditions 106X_upgrade2018_realistic_v11_L1v1 \
+    --beamspot Realistic25ns13TeVEarly2018Collision \
+    --step SIM \
+    --geometry DB:Extended \
     --filein "file:RunIISummer20UL18wmLHE_$NAME_$JOBINDEX.root" \
-	--era Run2_2018 \
-	--runUnscheduled \
-	--no_exec \
-	--mc \
+    --era Run2_2018 \
+    --runUnscheduled \
+    --no_exec \
+    --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
 cmsRun "RunIISummer20UL18SIM_${NAME}_cfg.py"
@@ -149,21 +152,21 @@ fi
 cd $TOPDIR
 cmsDriver.py  \
     --python_filename "RunIISummer20UL18DIGIPremix_${NAME}_cfg.py" \
-	--eventcontent PREMIXRAW \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier GEN-SIM-DIGI \
+    --eventcontent PREMIXRAW \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier GEN-SIM-DIGI \
     --filein "file:RunIISummer20UL18SIM_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL18DIGIPremix_$NAME_$JOBINDEX.root" \
     --pileup_input "$PILEUP_FILELIST" \
-	--conditions 106X_upgrade2018_realistic_v11_L1v1 \
-	--step DIGI,DATAMIX,L1,DIGI2RAW \
-	--procModifiers premix_stage2 \
-	--geometry DB:Extended \
-	--datamix PreMix \
-	--era Run2_2018 \
-	--runUnscheduled \
-	--no_exec \
-	--mc \
+    --conditions 106X_upgrade2018_realistic_v11_L1v1 \
+    --step DIGI,DATAMIX,L1,DIGI2RAW \
+    --procModifiers premix_stage2 \
+    --geometry DB:Extended \
+    --datamix PreMix \
+    --era Run2_2018 \
+    --runUnscheduled \
+    --no_exec \
+    --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
 cmsRun "RunIISummer20UL18DIGIPremix_${NAME}_cfg.py"
@@ -221,19 +224,19 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL18RECO_${NAME}_cfg.py" \
-	--eventcontent AODSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier AODSIM \
+    --eventcontent AODSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier AODSIM \
     --filein "file:RunIISummer20UL18HLT_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL18RECO_$NAME_$JOBINDEX.root" \
-	--conditions 106X_upgrade2018_realistic_v11_L1v1 \
-	--step RAW2DIGI,L1Reco,RECO,RECOSIM \
-	--geometry DB:Extended \
-	--era Run2_2018 \
-	--runUnscheduled \
-	--no_exec \
+    --conditions 106X_upgrade2018_realistic_v11_L1v1 \
+    --step RAW2DIGI,L1Reco,RECO,RECOSIM \
+    --geometry DB:Extended \
+    --era Run2_2018 \
+    --runUnscheduled \
+    --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
-	--mc \
+    --mc \
     -n $NEVENTS 
 cmsRun "RunIISummer20UL18RECO_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL18RECO_$NAME_$JOBINDEX.root" ]; then
@@ -245,13 +248,13 @@ fi
 # MiniAOD
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_10_6_25/src ] ; then
-    echo release CMSSW_10_6_25 already exists
-    cd CMSSW_10_6_25/src
+if [ -r CMSSW_10_6_20/src ] ; then
+    echo release CMSSW_10_6_20 already exists
+    cd CMSSW_10_6_20/src
     eval `scram runtime -sh`
 else
-    scram project -n "CMSSW_10_6_25" CMSSW_10_6_25
-    cd CMSSW_10_6_25/src
+    scram project -n "CMSSW_10_6_20" CMSSW_10_6_20
+    cd CMSSW_10_6_20/src
     eval `scram runtime -sh`
 fi
 cd $CMSSW_BASE/src
@@ -260,26 +263,27 @@ cd $TOPDIR
 
 cmsDriver.py  \
     --python_filename "RunIISummer20UL18MINIAODSIM_${NAME}_cfg.py" \
-	--eventcontent MINIAODSIM \
-	--customise Configuration/DataProcessing/Utils.addMonitoring \
-	--datatier MINIAODSIM \
+    --eventcontent MINIAODSIM \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --datatier MINIAODSIM \
     --filein "file:RunIISummer20UL18RECO_$NAME_$JOBINDEX.root" \
     --fileout "file:RunIISummer20UL18MINIAODSIM_$NAME_$JOBINDEX.root" \
-	--conditions 106X_upgrade2018_realistic_v16_L1v1 \
-	--step PAT \
-	--procModifiers run2_miniAOD_UL \
-	--geometry DB:Extended \
-	--era Run2_2018 \
-	--runUnscheduled \
-	--no_exec \
+    --conditions 106X_upgrade2018_realistic_v16_L1v1 \
+    --step PAT \
+    --procModifiers run2_miniAOD_UL \
+    --geometry DB:Extended \
+    --era Run2_2018 \
+    --runUnscheduled \
+    --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
-	--mc \
+    --mc \
     -n $NEVENTS
 cmsRun "RunIISummer20UL18MINIAODSIM_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL18MINIAODSIM_$NAME_$JOBINDEX.root" ]; then
     echo "RunIISummer20UL18MINIAODSIM_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
+
 
 # PFNano
 export SCRAM_ARCH=slc7_amd64_gcc700

@@ -9,8 +9,6 @@
 # Make sure to run setup_env.sh first to create a CMSSW tarball (have to patch the DR step to avoid taking forever to uniqify the list of 300K pileup files)
 echo $@
 
-cmssw-el7
-
 if [ -z "$1" ]; then
     echo "Argument 1 (name of job) is mandatory."
     return 1
@@ -287,7 +285,7 @@ if [ ! -f "RunIISummer20UL16MINIAODSIM_$NAME_$JOBINDEX.root" ]; then
 fi
 
 
-# PFNano
+# NanoAOD
 export SCRAM_ARCH=slc7_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 if [ -r CMSSW_10_6_32_patch1/src ] ; then
@@ -317,7 +315,7 @@ cmsDriver.py  \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \ \
     --mc \
-    -n $EVENTS
+    -n $NEVENTS
 cmsRun "RunIISummer20UL16NANOAODSIM_${NAME}_cfg.py"
 if [ ! -f "RunIISummer20UL16NANOAODSIM_$NAME_$JOBINDEX.root" ]; then
     echo "RunIISummer20UL16NANOAODSIM_$NAME_$JOBINDEX.root not found. Exiting."

@@ -11,16 +11,24 @@ if [ -z ${QUEUE} ]; then
     QUEUE=local
 fi
 
+#CAMPAIGNS=( "RunIISummer20UL16wmLHE" "RunIISummer20UL16APVwmLHE" "RunIISummer20UL17wmLHE" "RunIISummer20UL18wmLHE" )
+CAMPAIGNS=( "RunIISummer20UL18wmLHE" )
+
 if [ "$QUEUE" == "condor" ]; then
-    crun.py test_zpqq $MYOMCPATH/test/fragment_zpqq.py RunIISummer20UL17wmLHE \
-        --outEOS "/store/user/$USER/PrivateMC/test/" \
-        --keepMINI \
-        --nevents_job 10 \
-        --njobs 10 \
-        --env
+    for CAMPAIGN in "${CAMPAIGNS[@]}"; do
+        crun.py test_zpqq $MYOMCPATH/test/fragment_zpqq.py ${CAMPAIGN} \
+            --outEOS "/store/user/$USER/MYOMC/test/${CAMPAIGN}" \
+            --keepMINI \
+            --keepNANO \
+            --nevents_job 10 \
+            --njobs 10 \
+            --env \
+            --overwrite
+    done
 elif [ "$QUEUE" == "condor_eos" ]; then
     crun.py test_zpqq $MYOMCPATH/test/fragment_zpqq.py RunIISummer20UL17wmLHE \
         --keepMINI \
+        --keepNANO \
         --nevents_job 10 \
         --njobs 10 \
         --env

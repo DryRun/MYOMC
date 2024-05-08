@@ -17,6 +17,21 @@ elif "uscms" in hostname:
 else:
     raise ValueError("Unknown host {}".format(hostname))
 
+# Campaign-container lookup
+def get_campaign_container(campaign):
+    if "RunII" in campaign:
+        if "UL" in campaign:
+            container = "cmssw-el7"
+        else:
+            container = "cmssw-el6"
+    elif "Run3" in campaign:
+        container = "cmssw-el8"
+    elif campaign == "NANOGEN":
+        container = "cmssw-el7"
+    else:
+        raise ValueError("I don't know what container to use for campaign {campaign}. Please add it to get_campaign_container().")
+    return container
+
 
 MYOMCPATH = os.getenv("MYOMCPATH")
 if not MYOMCPATH:
@@ -64,6 +79,7 @@ if __name__ == "__main__":
 
     # Campaign check
     if not args.campaign in known_campaigns:
+        print(known_campaigns)
         raise ValueError("Unknown campaign: {}".format(args.campaign))
 
     # Check fragment exists
@@ -148,39 +164,36 @@ if __name__ == "__main__":
 
     # Submit to condor
     with open("runwrapper.sh", 'w') as run_script:
-        run_script.write("#!/bin/bash\n")
-        run_script.write("ls -lrth\n")
-        run_script.write("pwd\n")
-        run_script.write("mkdir work\n")
-        run_script.write("cd work\n")
-        run_script.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
+        run_script.write(f"""#!/bin/bash
+{get_campaign_container(args.campaign)}
+echo \"In runwrapper.sh, the OS is:\"
+cat /etc/os-release
+ls -lrth
+pwd
+mkdir work
+cd work
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+""")
         if args.env:
-            run_script.write("mv ../env.tar.gz .\n")
-            run_script.write("tar -xzf env.tar.gz\n")
-            run_script.write("echo \"After untarring env:\"\n")
-            run_script.write("ls -lrth\n")
-            run_script.write("for cdir in ./CMSSW*; do\n")
-            run_script.write("    echo $cdir\n")
-            run_script.write("    cd $cdir/src\n")
-            run_script.write("    scramv1 b ProjectRename\n")
-            #run_script.write("    scram b clean\n")
-            #run_script.write("    scram b -j8\n")
-            run_script.write("    cd $_CONDOR_SCRATCH_DIR/work\n")
-            run_script.write("done\n")
-        #run_script.write("env\n")
-        command = "source $_CONDOR_SCRATCH_DIR/run.sh {} $_CONDOR_SCRATCH_DIR/{} {} $(($1+{})) {} ".format(
-            args.name, 
-            os.path.basename(fragment_abspath), 
-            args.nevents_job,
-            args.seed_offset,
-            args.max_nthreads
-        )
+            run_script.write(f"""
+mv ../env.tar.gz .
+tar -xzf env.tar.gz
+echo \"After untarring env:\"
+ls -lrth
+for cdir in ./CMSSW*; do
+    echo $cdir
+    cd $cdir/src
+    scramv1 b ProjectRename
+    cd $_CONDOR_SCRATCH_DIR/work
+done
+""")
+        command = f"source $_CONDOR_SCRATCH_DIR/run.sh {args.name} $_CONDOR_SCRATCH_DIR/{os.path.basename(fragment_abspath)} {args.nevents_job} $(($1+{args.seed_offset})) {args.max_nthreads} "
         if args.pileup_file:
             command += " $_CONDOR_SCRATCH_DIR/pileupinput.dat"
         command += " 2>&1"
         run_script.write(command + "\n")
         #run_script.write("source run_BParkingNANO.sh {} $NEVENTS ./*MiniAOD*root".format(args.bnano_cfg))
-        run_script.write("mv *py $_CONDOR_SCRATCH_DIR\n")
+        run_script.write("mv *py $_CONDOR_SCRATCH_DIR\n") # Move .py files to top dir, so they get transferred back to submit node
 
         if args.outEOS:
             if args.keepNANOGEN:

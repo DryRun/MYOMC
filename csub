@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # bsub-like interface to condor
 
@@ -24,7 +24,7 @@ parser.add_argument('-n', '--queue_n', type=int, default=1, help="Queue n jobs f
 parser.add_argument('-o', '--transfer_output', type=str, help="Specify specific output files to transfer back")
 parser.add_argument('-t', '--time_limit', type=str, default="longlunch", help="JobFlavour option (espresso=20min, microcentury=1hr, longlunch=2hr, workday=8hr, tomorrow=1day, testmatch=3day, nextweek=1week")
 parser.add_argument('-p', '--pythonpath', action='store_true', help="Use the current PYTHONPATH")
-parser.add_argument('-O', '--os', type=str, default=None, help="Specify OS: SLCern6 or CentOS7")
+parser.add_argument('-O', '--os', type=str, default=None, help="Specify OS")
 parser.add_argument('-c', '--nCores', type=int, default=1, help="Request multiple cores")
 parser.add_argument('--no_submit', action='store_true', help="Prepare jobs but don't submit")
 #parser.add_argument('--cmssw', action='store_true', help='Transfer CMSSW libraries as a tarball')
@@ -33,10 +33,6 @@ parser.add_argument('--no_retar', action='store_true', help='Use existing tarbal
 parser.add_argument("--x509", "-x", type=str, default=None, help="Path to x509 proxy")
 args = parser.parse_args()
 
-#scripts = [os.path.realpath(x) for x in args.scripts.split(",")]
-if args.os:
-	if not args.os in ["SLCern6", "CentOS7"]:
-		raise ValueError("--os must be SLCern6 or CentOS7")
 
 starting_directory = os.getcwd()
 if args.working_directory:
@@ -89,10 +85,11 @@ if args.pythonpath:
 # Make top-level script
 top_script_name = "condor_run_" + timestamp + ".sh"
 top_script = open(top_script_name, 'w')
-top_script.write("#!/bin/bash\n")
-top_script.write("start=`date +%s`\n")
-top_script.write("export HOME=$_CONDOR_SCRATCH_DIR\n")
-top_script.write("echo \"Setting HOME to $_CONDOR_SCRATCH_DIR\"\n")
+top_script.write(f"""#!/bin/bash
+start=`date +%s`
+export HOME=$_CONDOR_SCRATCH_DIR
+echo \"Setting HOME to $_CONDOR_SCRATCH_DIR\"
+""")
 for env_name, env_value in env_to_transfer.items():
 	top_script.write("export " + env_name + "=" + env_value + "\n")
 #if args.cmssw_src:
@@ -125,16 +122,19 @@ if args.x509:
 	top_script.write("ls -lrth $X509_USER_PROXY\n")
 	top_script.write("voms-proxy-info -all\n")
 	files_to_transfer.append(x509_fullpath)
-top_script.write("source " + os.path.basename(args.script) + " $1\n")
-#top_script.write("source " + os.path.basename(args.script) + "\n")
-top_script.write("echo \"Job done.\"\n")
-top_script.write("\nContents of current directory:\n")
-top_script.write("ls -lrth\n")
-top_script.write("\nContents of top directory:\n")
-top_script.write("ls -lrth $_CONDOR_SCRATCH_DIR\n")
-top_script.write("end=`date +%s`\n")
-top_script.write("runtime=$((end-start))\n")
-top_script.write("echo \"Run time $runtime\"\n")
+top_script.write(f"""#!/bin/bash
+source {os.path.basename(args.script)} $1
+echo \"Job done.\"
+
+echo \"Contents of current directory:\"
+ls -lrth
+
+echo \"Contents of top directory:\"
+ls -lrth $_CONDOR_SCRATCH_DIR
+end=`date +%s`
+runtime=$((end-start))
+echo \"Run time $runtime\"
+""")
 top_script.close()
 files_to_transfer.append(top_script_name)
 
@@ -144,26 +144,27 @@ if args.submit_file:
 else:
 	submission_file_name = "condor_submit_" + timestamp + ".jdl"
 submission_file = open(submission_file_name, 'w')
-submission_file.write("executable = " + top_script_name + "\n")
-submission_file.write("request_memory = " + str(args.mem) + "\n")
-submission_file.write("use_x509userproxy = true\n")
-submission_file.write("transfer_executable = true\n")
-submission_file.write("notification = never\n")
-submission_file.write("getenv = false\n")
-#submission_file.write("use_x509userproxy = true\n")
-submission_file.write("should_transfer_files = yes\n")
-submission_file.write("transfer_input_files=" + ",".join(files_to_transfer) + "\n")
-submission_file.write("when_to_transfer_output = on_exit\n")
-#submission_file.write("notification = Always\n")
-#submission_file.write("notify_user = email@ddr.es\n")
+submission_file.write(f"""
+executable = {top_script_name}
+request_memory = {args.mem}
+use_x509userproxy = true
+transfer_executable = true
+notification = never
+getenv = false
+use_x509userproxy = true
+should_transfer_files = yes
+transfer_input_files={','.join(files_to_transfer)}
+when_to_transfer_output = on_exit
+""")
+
 if args.os:
 	# Try to get hostname
 	import socket
 	hostname = socket.gethostname()
 	if "cmslpc" in hostname:
-		if args.os == "SLCern6":
+		if args.os == "SLCern6" or args.os == "sl6":
 			submission_file.write("+DesiredOS=\"SL6\"\n")
-		elif args.os == "CentOS7":
+		elif args.os == "CentOS7" or args.os == "sl7":
 			submission_file.write("+DesiredOS=\"SL7\"\n")
 	else:
 		submission_file.write("requirements = (OpSysAndVer =?= \"{}\")\n".format(args.os))
@@ -180,11 +181,13 @@ else:
 	log_stdout = "log_" + timestamp + "_$(Cluster).$(Process).stdout"
 	log_stderr = "log_" + timestamp + "_$(Cluster).$(Process).stderr"
 	log_condor = "log_" + timestamp + "_$(Cluster).$(Process).condor"
-submission_file.write("output = " + log_stdout + "\n")
-submission_file.write("error = " + log_stderr + "\n")
-submission_file.write("log = " + log_condor + "\n")
-submission_file.write("arguments = $(Process)")
-submission_file.write("\nqueue " + str(args.queue_n) + "\n")
+submission_file.write(f"""
+output = {log_stdout}
+error = {log_stderr}
+log = {log_condor}
+arguments = $(Process)
+queue {args.queue_n}
+""")
 
 #submission_file.write("\nqueue " + str(args.queue_n) + "\n")
 submission_file.close()

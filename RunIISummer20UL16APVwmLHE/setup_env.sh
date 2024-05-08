@@ -14,6 +14,10 @@
 #  return 1
 #fi
 
+if [ -d env ]; then
+	rm -rf env
+fi
+
 mkdir env
 cd env
 export SCRAM_ARCH=slc7_amd64_gcc700

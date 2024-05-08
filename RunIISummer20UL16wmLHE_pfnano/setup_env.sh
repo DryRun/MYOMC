@@ -14,6 +14,10 @@
 #  return 1
 #fi
 
+if [ -d env ]; then
+	rm -rf env
+fi
+
 mkdir env
 cd env
 export SCRAM_ARCH=slc7_amd64_gcc700
@@ -36,6 +40,12 @@ cd CMSSW_8_0_33_UL/src
 eval `scram runtime -sh`
 scram b
 cd ../..
+
+scram project -n "CMSSW_10_6_25" CMSSW_10_6_25
+cd CMSSW_10_6_25/src
+eval `scram runtime -sh`
+scram b
+cd ../../
 
 scram project -n "CMSSW_10_6_26_PFNano" CMSSW_10_6_26
 cd CMSSW_10_6_26_PFNano/src
