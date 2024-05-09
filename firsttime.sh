@@ -10,11 +10,11 @@ CAMPAIGNS=( "RunIISummer20UL16wmLHE" "RunIISummer20UL16APVwmLHE" "RunIISummer20U
 for CAMPAIGN in "${CAMPAIGNS[@]}"; do
 	cd campaigns/$CAMPAIGN	
 	if [[ $CAMPAIGN == *"RunIISummer"* ]]; then
-		cmssw-el7 -p --bind `readlink -f ${PWD}` --bind `readlink $HOME/private` -- ./setup_env.sh
+		cmssw-el7 -p --bind `readlink -f ${PWD}` --bind `readlink -f $HOME/private` -- ./setup_env.sh
 	elif [[ $CAMPAIGN == *"NANOGEN"* ]]; then
-		cmssw-el7 -p --bind `readlink -f ${PWD}` --bind `readlink $HOME/private` -- ./setup_env.sh
+		cmssw-el7 -p --bind `readlink -f ${PWD}` --bind `readlink -f $HOME/private` -- ./setup_env.sh
 	elif [[ $CAMPAIGN == *"Run3"* ]]; then
-		cmssw-el8 -p --bind `readlink -f ${PWD}` --bind `readlink $HOME/private` -- ./setup_env.sh
+		cmssw-el8 -p --bind `readlink -f ${PWD}` --bind `readlink -f $HOME/private` -- ./setup_env.sh
 	else
 		echo "I don't know what OS to use for campaign ${CAMPAIGN}. Please fix firsttime.sh."
 		exit 1
