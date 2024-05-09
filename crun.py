@@ -18,19 +18,19 @@ else:
     raise ValueError("Unknown host {}".format(hostname))
 
 # Campaign-container lookup
-def get_campaign_container(campaign):
+def get_campaign_os(campaign):
     if "RunII" in campaign:
         if "UL" in campaign:
-            container = "cmssw-el7"
+            required_os = "el7"
         else:
-            container = "cmssw-el6"
+            required_os = "el6"
     elif "Run3" in campaign:
-        container = "cmssw-el8"
+        required_os = "el8"
     elif campaign == "NANOGEN":
-        container = "cmssw-el7"
+        required_os = "el7"
     else:
-        raise ValueError("I don't know what container to use for campaign {campaign}. Please add it to get_campaign_container().")
-    return container
+        raise ValueError("I don't know what os to use for campaign {campaign}. Please add it to get_campaign_os().")
+    return required_os
 
 
 MYOMCPATH = os.getenv("MYOMCPATH")
@@ -165,15 +165,16 @@ if __name__ == "__main__":
     # Submit to condor
     with open("runwrapper.sh", 'w') as run_script:
         run_script.write(f"""#!/bin/bash
-{get_campaign_container(args.campaign)}
 echo \"In runwrapper.sh, the OS is:\"
 cat /etc/os-release
 ls -lrth
 pwd
 mkdir work
 cd work
-source /cvmfs/cms.cern.ch/cmsset_default.sh
 """)
+        #{get_campaign_container(args.campaign)}
+        #which {get_campaign_container(args.campaign)}
+
         if args.env:
             run_script.write(f"""
 mv ../env.tar.gz .
@@ -293,11 +294,13 @@ done
         files_to_transfer.append("{}/{}/pileupinput.dat".format(MYOMCPATH, args.campaign))
     if args.env:
         files_to_transfer.append("{}/{}/env.tar.gz".format(MYOMCPATH, args.campaign))
-    csub_command = "csub runwrapper.sh -t tomorrow --mem {} --nCores {} -F {} --queue_n {} -x $HOME/private/x509up".format(
-                        args.mem,
-                        args.max_nthreads, 
-                        ",".join(files_to_transfer), 
-                        args.njobs) # 
+    csub_command = f"csub runwrapper.sh -t tomorrow \
+--mem {args.mem} \
+--nThreads {args.max_nthreads} \
+-F {','.join(files_to_transfer)} \
+--queue_n {args.njobs} \
+-x $HOME/private/x509up \
+--os {get_campaign_os(args.campaign)}"
     '''
     if not args.os:
         # Infer OS from campaign
