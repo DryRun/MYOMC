@@ -37,7 +37,7 @@ MYOMCPATH = os.getenv("MYOMCPATH")
 if not MYOMCPATH:
     raise ValueError("Environment variable MYOMCPATH must be set. Call env.sh.")
 
-known_campaigns = [x for x in os.listdir(os.path.expandvars("$MYOMCPATH")) if x[:3]=="Run"]
+known_campaigns = [x for x in os.listdir(f"{os.path.expandvars("$MYOMCPATH")}/campaigns/") if x[:3]=="Run"]
 known_campaigns.append("NANOGEN")
 #known_campaigns = ["RunIIFall18GS", "RunIIFall18GSBParking", "RunIISummer20UL17wmLHE", "NANOGEN"]:
 
@@ -288,12 +288,12 @@ done
 
 
     files_to_transfer = [fragment_abspath, 
-                            "{}/{}/run.sh".format(MYOMCPATH, args.campaign), 
+                            f"{MYOMCPATH}/campaigns/{args.campaign}/run.sh", 
                         ]
     if args.pileup_file:
-        files_to_transfer.append("{}/{}/pileupinput.dat".format(MYOMCPATH, args.campaign))
+        files_to_transfer.append(f"{MYOMCPATH}/campaigns/{args.campaign}/pileupinput.dat")
     if args.env:
-        files_to_transfer.append("{}/{}/env.tar.gz".format(MYOMCPATH, args.campaign))
+        files_to_transfer.append(f"{MYOMCPATH}/campaigns/{args.campaign}/env.tar.gz")
     csub_command = f"csub runwrapper.sh -t tomorrow \
 --mem {args.mem} \
 --nThreads {args.max_nthreads} \
