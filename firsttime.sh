@@ -8,9 +8,9 @@ for CAMPAIGN in "${CAMPAIGNS[@]}"; do
 	cd campaigns/$CAMPAIGN
 	#source setup_env.sh
 	if [[ $CAMPAIGN == *"RunIISummer"* ]]; then
-		cmssw-el7 -- setup_env.sh
+		cmssw-el7 -- ./setup_env.sh
 	elif [[ $CAMPAIGN == *"Run3"* ]]; then
-		cmssw-el8 -- setup_env.sh
+		cmssw-el8 -- ./setup_env.sh
 	else
 		echo "I don't know what OS to use for campaign ${CAMPAIGN}. Please fix firsttime.sh."
 		exit 1
