@@ -9,12 +9,11 @@ for CAMPAIGN in "${CAMPAIGNS[@]}"; do
 	#source setup_env.sh
 	
 	if [[ $CAMPAIGN == *"RunIISummer"* ]]; then
-		ls -lrth
-		cmssw-el7 -- ./setup_env.sh
+		cmssw-el7 -p --bind `readlink -f ${PWD}` -- ./setup_env.sh
 	elif [[ $CAMPAIGN == *"NANOGEN"* ]]; then
-		cmssw-el7 -- ./setup_env.sh
+		cmssw-el7 -p --bind `readlink -f ${PWD}` -- ./setup_env.sh
 	elif [[ $CAMPAIGN == *"Run3"* ]]; then
-		cmssw-el8 -- ./setup_env.sh
+		cmssw-el8 -p --bind `readlink -f ${PWD}` -- ./setup_env.sh
 	else
 		echo "I don't know what OS to use for campaign ${CAMPAIGN}. Please fix firsttime.sh."
 		exit 1
