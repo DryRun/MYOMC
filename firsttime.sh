@@ -7,7 +7,11 @@ CAMPAIGNS=( "RunIISummer20UL16wmLHE" "RunIISummer20UL16APVwmLHE" "RunIISummer20U
 for CAMPAIGN in "${CAMPAIGNS[@]}"; do
 	cd campaigns/$CAMPAIGN
 	#source setup_env.sh
+	
 	if [[ $CAMPAIGN == *"RunIISummer"* ]]; then
+		ls -lrth
+		cmssw-el7 -- ./setup_env.sh
+	elif [[ $CAMPAIGN == *"NANOGEN"* ]]; then
 		cmssw-el7 -- ./setup_env.sh
 	elif [[ $CAMPAIGN == *"Run3"* ]]; then
 		cmssw-el8 -- ./setup_env.sh
