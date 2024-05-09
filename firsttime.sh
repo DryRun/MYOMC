@@ -19,6 +19,8 @@ for CAMPAIGN in "${CAMPAIGNS[@]}"; do
 		echo "I don't know what OS to use for campaign ${CAMPAIGN}. Please fix firsttime.sh."
 		exit 1
 	fi
-	source getpileupfiles.sh
+	if [ -e "getpileupfiles.sh" ]; then
+		source getpileupfiles.sh
+	fi
 	cd $TOPDIR
 done

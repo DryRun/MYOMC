@@ -57,15 +57,15 @@ TOPDIR=$PWD
 # Setup CMSSW and merge NANOGEN stuff
 #export SCRAM_ARCH=slc6_amd64_gcc700
 export SCRAM_ARCH=slc7_amd64_gcc820
-if [ -r CMSSW_10_6_22_NANOGEN ] ; then
-    echo release CMSSW_10_6_22_NANOGEN already exists
-    cd CMSSW_10_6_22_NANOGEN/src
+if [ -r CMSSW_10_6_32_patch1 ] ; then
+    echo release CMSSW_10_6_32_patch1 already exists
+    cd CMSSW_10_6_32_patch1/src
     eval `scram runtime -sh`
     scram b -j8
     cd $TOPDIR
 else
-    scram project -n "CMSSW_10_6_22_NANOGEN" CMSSW_10_6_22
-    cd CMSSW_10_6_22_NANOGEN/src
+    scram project -n "CMSSW_10_6_32_patch1" CMSSW_10_6_32_patch1
+    cd CMSSW_10_6_32_patch1/src
     eval `scram runtime -sh`
     #git cms-init
     #git cms-merge-topic DryRun:CMSSW_10_6_22-NANOGEN

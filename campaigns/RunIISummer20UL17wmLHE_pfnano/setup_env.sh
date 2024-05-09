@@ -55,7 +55,7 @@ cd $CMSSW_BASE/src
 scram b
 cd ../../
 
-tar -czvf env.tar.gz ./CMSSW*
+tar -czf env.tar.gz ./CMSSW*
 mv env.tar.gz ..
 cd ..
 

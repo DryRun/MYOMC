@@ -14,18 +14,24 @@
 #  return 1
 #fi
 
+if [ -d env ]; then
+	rm -rf env
+fi
+
 mkdir -pv env
 cd env
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+
 #export SCRAM_ARCH=slc6_amd64_gcc700
-scram project -n "CMSSW_10_6_30_patch1_NANOGEN" CMSSW_10_6_30_patch1
-cd CMSSW_10_6_30_patch1_NANOGEN/src
+scram project -n "CMSSW_10_6_32_patch1" CMSSW_10_6_32_patch1
+cd CMSSW_10_6_32_patch1/src
 eval `scram runtime -sh`
 #git cms-init
 #git cms-merge-topic DryRun:CMSSW_10_6_22_NANOGEN-NANOGEN
-scram b -j8
+scram b
 cd ../../
 
-tar -czvf env.tar.gz ./CMSSW*
+tar -czf env.tar.gz ./CMSSW*
 mv env.tar.gz ..
 cd ..
 
