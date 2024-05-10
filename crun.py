@@ -127,14 +127,14 @@ if __name__ == "__main__":
         # Create output directory
         if host == "lxplus" or host == "cmslpc":
             import subprocess
-            subp = subprocess.Popen("eos {} ls {}".format(eos_prefix, args.outEOS).split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subp = subprocess.Popen("eos {} ls {}".format(eos_prefix, args.outEOS).split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = subp.communicate()
             if subp.returncode == 0:
                 print("WARNING : EOS output directory {} already exists! Writing to existing directory, but be careful.".format(args.outEOS))
             else:
                 print("Creating EOS output directory {}".format(args.outEOS))
                 print("eos {} mkdir -p {}".format(eos_prefix, args.outEOS))
-                subp = subprocess.Popen("eos {} mkdir {}".format(eos_prefix, args.outEOS).split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subp = subprocess.Popen(f"eos {eos_prefix} mkdir {args.outEOS}".split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = subp.communicate()
                 print(stdout)
                 print(stderr)

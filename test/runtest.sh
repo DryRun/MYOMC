@@ -17,7 +17,7 @@ CAMPAIGNS=( "RunIISummer20UL18wmLHE" )
 if [ "$QUEUE" == "condor" ]; then
     for CAMPAIGN in "${CAMPAIGNS[@]}"; do
         crun.py test_zpqq $MYOMCPATH/test/fragment_zpqq.py ${CAMPAIGN} \
-            --outEOS "/store/user/$USER/MYOMC/test/${CAMPAIGN}" \
+            --outEOS "/store/user/$USER/MYOMC/test/${CAMPAIGN}/$(date +"%Y-%m-%d-%H-%M-%S")/" \
             --keepMINI \
             --keepNANO \
             --nevents_job 10 \
