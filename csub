@@ -16,7 +16,7 @@ def get_os_container(required_os, hostname):
         # Use rhel containers, as x509 proxy doesn't work with unpacked.cern.ch el* containers
         container = f"/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rh{required_os}-x86_64"
     else:
-        container = f"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/rh{required_os}:x86_64"
+        container = f"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/{required_os}:x86_64"
 
     return container
 
