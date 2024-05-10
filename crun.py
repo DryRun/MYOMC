@@ -37,7 +37,7 @@ MYOMCPATH = os.getenv("MYOMCPATH")
 if not MYOMCPATH:
     raise ValueError("Environment variable MYOMCPATH must be set. Call env.sh.")
 
-known_campaigns = [x for x in os.listdir(f"{os.path.expandvars("$MYOMCPATH")}/campaigns/") if x[:3]=="Run"]
+known_campaigns = [x for x in os.listdir(f"{os.path.expandvars('$MYOMCPATH')}/campaigns/") if x[:3]=="Run"]
 known_campaigns.append("NANOGEN")
 #known_campaigns = ["RunIIFall18GS", "RunIIFall18GSBParking", "RunIISummer20UL17wmLHE", "NANOGEN"]:
 
