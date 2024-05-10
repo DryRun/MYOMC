@@ -11,8 +11,8 @@ timestamp = str(time.time()).replace(".","_")
 #sys.path.insert(0, os.path.expandvars("$CMSSW_BASE/src/MyTools/RootUtils/scripts"))
 #from csub_tar import make_tarball, get_tarball_path
 
-def get_os_container(required_os, hostname):
-    if "cmslpc" in hostname:
+def get_os_container(required_os, ihost):
+    if "cmslpc" in ihost:
         # Use rhel containers, as x509 proxy doesn't work with unpacked.cern.ch el* containers
         container = f"/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rh{required_os}-x86_64"
     else:
@@ -44,8 +44,16 @@ parser.add_argument('--no_retar', action='store_true', help='Use existing tarbal
 parser.add_argument("--x509", "-x", type=str, default=None, help="Path to x509 proxy")
 args = parser.parse_args()
 
-import socket
 hostname = socket.gethostname()
+print(f"Detected host {hostname}")
+if "cmslpc" in hostname:
+    host = "cmslpc"
+elif "lxplus" in hostname:
+    host = "lxplus"
+elif "uscms" in hostname:
+    host = "cmsconnect"
+else:
+    raise ValueError("Unknown host {}".format(hostname))
 
 if args.os and args.internal_os:
     raise ValueError("Cannot specify --os and --internal_os")
@@ -214,10 +222,10 @@ if args.os:
     else:
         submission_file.write("requirements = (OpSysAndVer =?= \"{}\")\n".format(args.os))
     '''
-    if "cmslpc" in hostname:
-        submission_file.write(f"+ApptainerImage = \"{get_os_container(args.os, hostname)}\"\n")
+    if host == "cmslpc":
+        submission_file.write(f"+ApptainerImage = \"{get_os_container(args.os, host)}\"\n")
     else:      
-        submission_file.write(f"MY.SingularityImage = \"{get_os_container(args.os, hostname)}\"\n")
+        submission_file.write(f"MY.SingularityImage = \"{get_os_container(args.os, host)}\"\n")
 
 if args.nThreads:
     submission_file.write("request_cpus = {}\n".format(args.nThreads))
