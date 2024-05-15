@@ -44,6 +44,7 @@ parser.add_argument('--no_retar', action='store_true', help='Use existing tarbal
 parser.add_argument("--x509", "-x", type=str, default=None, help="Path to x509 proxy")
 args = parser.parse_args()
 
+import socket
 hostname = socket.gethostname()
 print(f"Detected host {hostname}")
 if "cmslpc" in hostname:
