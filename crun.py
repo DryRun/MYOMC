@@ -155,7 +155,9 @@ if __name__ == "__main__":
                 print(stderr)
 
     # Create and move to working directory
-    csub_dir = "{}/{}".format(args.name, args.campaign)
+    from datetime import datetime
+    dtstring = datetime.now().strftime("%Y%m%d_%H%M")
+    csub_dir = "jobs/job_{}/{}/{}".format(dtstring, args.name, args.campaign)
     if os.path.isdir(csub_dir) and not args.overwrite:
         raise ValueError("Working directory {} already exists! Specify -f to overwrite".format(csub_dir))
     os.system("mkdir -pv {}".format(csub_dir))
