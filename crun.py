@@ -134,7 +134,7 @@ if __name__ == "__main__":
             else:
                 print("Creating EOS output directory {}".format(args.outEOS))
                 print("eos {} mkdir -p {}".format(eos_prefix, args.outEOS))
-                subp = subprocess.Popen(f"eos {eos_prefix} mkdir {args.outEOS}".split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subp = subprocess.Popen(f"eos {eos_prefix} mkdir -p {args.outEOS}".split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = subp.communicate()
                 print(stdout)
                 print(stderr)
