@@ -20,7 +20,7 @@ if [ "$QUEUE" == "condor" ]; then
             --outEOS "/store/user/$USER/MYOMC/test/${CAMPAIGN}/$(date +"%Y-%m-%d-%H-%M-%S")/" \
             --keepMINI \
             --keepNANO \
-            --nevents_job 8 \
+            --nevents_job 16 \
             --njobs 4 \
             --env \
             --overwrite
