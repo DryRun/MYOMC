@@ -202,9 +202,9 @@ done
             if args.keepNANOGEN:
                 run_script.write("xrdcp -p -f *NANOGEN*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepNANO:
-                run_script.write("xrdcp -p -f *NANOAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp -p -f *NanoAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepMINI:
-                run_script.write("xrdcp -p -f *MINIAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
+                run_script.write("xrdcp -p -f *MiniAOD*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepDR:
                 run_script.write("xrdcp -p -f *DR*root {}/{} \n".format(eos_prefix, args.outEOS))
             if args.keepRECO:
@@ -303,23 +303,7 @@ done
 --queue_n {args.njobs} \
 -x $HOME/private/x509up \
 --os {get_campaign_os(args.campaign)}"
-    '''
-    if not args.os:
-        # Infer OS from campaign
-        if "RunII" in args.campaign and not "UL" in args.campaign:
-            job_os = "SLCern6"
-        elif "UL" in args.campaign:
-            job_os = "CentOS7"
-        elif args.campaign == "NANOGEN":
-            job_os = "SLCern6"
-        else:
-            print "Unable to infer OS from campaign {}. Using CC7.".format(args.campaign)
-            job_os = "CentOS7"
-    else:
-        job_os = args.os
-    print("Using OS {}".format(job_os))
-    csub_command += " --os {}".format(job_os)
-    '''
+    
     os.system(csub_command)
 
     os.chdir(cwd)

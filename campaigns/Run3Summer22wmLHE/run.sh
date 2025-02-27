@@ -121,7 +121,6 @@ cmsDriver.py  \
     --geometry DB:Extended \
     --datamix PreMix \
     --era Run3 \
-    --runUnscheduled \
     --no_exec \
     --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
@@ -146,7 +145,6 @@ cmsDriver.py  \
     --procModifiers siPixelQualityRawToDigi \
     --geometry DB:Extended \
     --era Run3 \
-    --runUnscheduled \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --mc \
@@ -185,7 +183,6 @@ cmsDriver.py  \
     --step PAT \
     --geometry DB:Extended \
     --era Run3,run3_miniAOD_12X \
-    --runUnscheduled \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --mc \

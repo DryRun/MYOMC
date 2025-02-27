@@ -121,7 +121,6 @@ cmsDriver.py  \
     --geometry DB:Extended \
     --datamix PreMix \
     --era Run3_2023 \
-    --runUnscheduled \
     --no_exec \
     --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
@@ -145,7 +144,6 @@ cmsDriver.py  \
     --step RAW2DIGI,L1Reco,RECO,RECOSIM \
     --geometry DB:Extended \
     --era Run3_2023 \
-    --runUnscheduled \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --mc \
@@ -168,7 +166,6 @@ cmsDriver.py  \
     --step PAT \
     --geometry DB:Extended \
     --era Run3_2023 \
-    --runUnscheduled \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --mc \
