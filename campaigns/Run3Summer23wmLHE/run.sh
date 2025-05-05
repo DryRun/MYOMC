@@ -41,10 +41,10 @@ if [ -z "$5" ]; then
 else
     MAX_NTHREADS=$5
 fi
-RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed. The extra *4 is a paranoia factor.
+RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001 + $RANDOM)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed. The extra *4 is a paranoia factor.
 
 if [ -z "$6" ]; then
-    PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" 
+    PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer23_130X_mcRun3_2023_realistic_v13-v1/PREMIX" 
 else
     PILEUP_FILELIST="filelist:$6"
 fi
@@ -83,11 +83,11 @@ cd $TOPDIR
 #cat $CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py
 
 cmsDriver.py Configuration/GenProduction/python/fragment.py \
-    --python_filename "Run3Summer22wmLHE_${NAME}_cfg.py" \
+    --python_filename "Run3Summer23wmLHE_${NAME}_cfg.py" \
     --eventcontent RAWSIM,LHE \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN-SIM,LHE \
-    --fileout "file:Run3Summer22wmLHEGS_$NAME_$JOBINDEX.root" \
+    --fileout "file:Run3Summer23wmLHEGS_$NAME_$JOBINDEX.root" \
     --conditions 130X_mcRun3_2023_realistic_v14 \
     --beamspot Realistic25ns13p6TeVEarly2023Collision \
     --step LHE,GEN,SIM \
@@ -98,9 +98,9 @@ cmsDriver.py Configuration/GenProduction/python/fragment.py \
     --customise_commands "process.source.numberEventsInLuminosityBlock=cms.untracked.uint32(1000)\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed=${RSEED}" \
     --mc \
     -n $NEVENTS 
-cmsRun "Run3Summer22wmLHE_${NAME}_cfg.py"
-if [ ! -f "Run3Summer22wmLHEGS_$NAME_$JOBINDEX.root" ]; then
-    echo "Run3Summer22wmLHEGS_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "Run3Summer23wmLHE_${NAME}_cfg.py"
+if [ ! -f "Run3Summer23wmLHEGS_$NAME_$JOBINDEX.root" ]; then
+    echo "Run3Summer23wmLHEGS_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
@@ -108,12 +108,12 @@ fi
 # DIGIPremix
 cd $TOPDIR
 cmsDriver.py  \
-    --python_filename "Run3Summer22DRPremix0_${NAME}_cfg.py" \
+    --python_filename "Run3Summer23DRPremix0_${NAME}_cfg.py" \
     --eventcontent PREMIXRAW \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN-SIM-RAW \
-    --filein "file:Run3Summer22wmLHEGS_$NAME_$JOBINDEX.root" \
-    --fileout "file:Run3Summer22DRPremix0_$NAME_$JOBINDEX.root" \
+    --filein "file:Run3Summer23wmLHEGS_$NAME_$JOBINDEX.root" \
+    --fileout "file:Run3Summer23DRPremix0_$NAME_$JOBINDEX.root" \
     --pileup_input "$PILEUP_FILELIST" \
     --conditions 130X_mcRun3_2023_realistic_v14 \
     --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2023v12 \
@@ -125,21 +125,21 @@ cmsDriver.py  \
     --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     -n $NEVENTS
-cmsRun "Run3Summer22DRPremix0_${NAME}_cfg.py"
-if [ ! -f "Run3Summer22DRPremix0_$NAME_$JOBINDEX.root" ]; then
-    echo "Run3Summer22DRPremix0_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "Run3Summer23DRPremix0_${NAME}_cfg.py"
+if [ ! -f "Run3Summer23DRPremix0_$NAME_$JOBINDEX.root" ]; then
+    echo "Run3Summer23DRPremix0_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
 
 # RECO
 cmsDriver.py  \
-    --python_filename "Run3Summer22DRPremix_${NAME}_cfg.py" \
+    --python_filename "Run3Summer23DRPremix_${NAME}_cfg.py" \
     --eventcontent AODSIM \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier AODSIM \
-    --filein "file:Run3Summer22DRPremix0_$NAME_$JOBINDEX.root" \
-    --fileout "file:Run3Summer22RECO_$NAME_$JOBINDEX.root" \
+    --filein "file:Run3Summer23DRPremix0_$NAME_$JOBINDEX.root" \
+    --fileout "file:Run3Summer23RECO_$NAME_$JOBINDEX.root" \
     --conditions 130X_mcRun3_2023_realistic_v14 \
     --step RAW2DIGI,L1Reco,RECO,RECOSIM \
     --geometry DB:Extended \
@@ -148,20 +148,20 @@ cmsDriver.py  \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --mc \
     -n $NEVENTS 
-cmsRun "Run3Summer22DRPremix_${NAME}_cfg.py"
-if [ ! -f "Run3Summer22RECO_$NAME_$JOBINDEX.root" ]; then
-    echo "Run3Summer22RECO_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "Run3Summer23DRPremix_${NAME}_cfg.py"
+if [ ! -f "Run3Summer23RECO_$NAME_$JOBINDEX.root" ]; then
+    echo "Run3Summer23RECO_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
 
 cmsDriver.py  \
-    --python_filename "Run3Summer22MINIAODSIM_${NAME}_cfg.py" \
+    --python_filename "Run3Summer23MINIAODSIM_${NAME}_cfg.py" \
     --eventcontent MINIAODSIM \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier MINIAODSIM \
-    --filein "file:Run3Summer22RECO_$NAME_$JOBINDEX.root" \
-    --fileout "file:Run3Summer22MiniAODv4_$NAME_$JOBINDEX.root" \
+    --filein "file:Run3Summer23RECO_$NAME_$JOBINDEX.root" \
+    --fileout "file:Run3Summer23MiniAODv4_$NAME_$JOBINDEX.root" \
     --conditions 130X_mcRun3_2022_realistic_v5 \
     --step PAT \
     --geometry DB:Extended \
@@ -170,30 +170,30 @@ cmsDriver.py  \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --mc \
     -n $NEVENTS
-cmsRun "Run3Summer22MINIAODSIM_${NAME}_cfg.py"
-if [ ! -f "Run3Summer22MiniAODv4_$NAME_$JOBINDEX.root" ]; then
-    echo "Run3Summer22MiniAODv4_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "Run3Summer23MINIAODSIM_${NAME}_cfg.py"
+if [ ! -f "Run3Summer23MiniAODv4_$NAME_$JOBINDEX.root" ]; then
+    echo "Run3Summer23MiniAODv4_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
 
 #NanoAODv12
 cmsDriver.py  \
-    --python_filename "Run3Summer22NanoAODv12_${NAME}_cfg.py" \
-    --filein "file:Run3Summer22MiniAODv4_$NAME_$JOBINDEX.root" \
-    --fileout "file:Run3Summer22NanoAODv12_$NAME_$JOBINDEX.root" \
-    --eventcontent NANOEDMAODSIM \
+    --python_filename "Run3Summer23NanoAODv12_${NAME}_cfg.py" \
+    --filein "file:Run3Summer23MiniAODv4_$NAME_$JOBINDEX.root" \
+    --fileout "file:Run3Summer23NanoAODv12_$NAME_$JOBINDEX.root" \
+    --eventcontent NANOAODSIM \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier NANOAODSIM \
     --conditions 130X_mcRun3_2022_realistic_v5 \
-    --step NANO \
+    --step NANO:@BTV \
     --scenario pp \
     --era Run3_2023 \
     --no_exec \
     --mc \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \ \
     -n $NEVENTS
-cmsRun "Run3Summer22NanoAODv12_${NAME}_cfg.py"
-if [ ! -f "Run3Summer22NanoAODv12_$NAME_$JOBINDEX.root" ]; then
-    echo "Run3Summer22NanoAODv12_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "Run3Summer23NanoAODv12_${NAME}_cfg.py"
+if [ ! -f "Run3Summer23NanoAODv12_$NAME_$JOBINDEX.root" ]; then
+    echo "Run3Summer23NanoAODv12_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi

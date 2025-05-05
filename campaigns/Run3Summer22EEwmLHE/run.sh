@@ -41,7 +41,7 @@ if [ -z "$5" ]; then
 else
     MAX_NTHREADS=$5
 fi
-RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed. The extra *4 is a paranoia factor.
+RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001 + $RANDOM)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed. The extra *4 is a paranoia factor.
 
 if [ -z "$6" ]; then
     PILEUP_FILELIST="dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" 
@@ -198,7 +198,7 @@ cmsDriver.py  \
     --python_filename "Run3Summer22EENanoAODv12_${NAME}_cfg.py" \
     --filein "file:Run3Summer22EEMiniAODv4_$NAME_$JOBINDEX.root" \
     --fileout "file:Run3Summer22EENanoAODv12_$NAME_$JOBINDEX.root" \
-    --eventcontent NANOEDMAODSIM \
+    --eventcontent NANOAODSIM \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier NANOAODSIM \
     --conditions 130X_mcRun3_2022_realistic_postEE_v6 \
