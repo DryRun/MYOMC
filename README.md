@@ -4,7 +4,7 @@ This repository proves scripts to run private MC generation. It consists of the 
 
 Setup instructions (note: `git cms-addpkg` has to work):
 ```
-git clone git@github.com:DryRun/MYOMC.git
+git clone git@github.com:gabhijith/MYOMC.git
 cd MYOMC
 source firsttime.sh
 # For future sessions, run env.sh
