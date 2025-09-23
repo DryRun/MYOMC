@@ -1,0 +1,264 @@
+#!/usr/bin/env python3
+
+# bsub-like interface to condor
+
+import os
+import sys
+import argparse
+import string
+import time
+timestamp = str(time.time()).replace(".","_")
+#sys.path.insert(0, os.path.expandvars("$CMSSW_BASE/src/MyTools/RootUtils/scripts"))
+#from csub_tar import make_tarball, get_tarball_path
+
+def get_os_container(required_os, ihost):
+    if "cmslpc" in ihost:
+        # Use rhel containers, as x509 proxy doesn't work with unpacked.cern.ch el* containers
+        container = f"/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rh{required_os}-x86_64"
+    else:
+        container = f"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/{required_os}:x86_64"
+
+    return container
+
+parser = argparse.ArgumentParser(description = 'qsub-like interface to condor')
+parser.add_argument('script', type=str, help='Script to execute.')
+#parser.add_argument('-c', '--container', type=str, default=None, help='Run script in a cmssw apptainer')
+parser.add_argument('-f', '--file_list', type=str, help='Text file listing files to transfer (newline-separated)')
+parser.add_argument('-F', '--file_string', type=str, help='Files to transfer (comma-separated)')
+parser.add_argument('-m', '--mem', type=int, default=3000, help='Memory requirement (MB)')
+parser.add_argument('-l', '--log', type=str, help="Log file name")
+parser.add_argument('-s', '--submit_file', type=str, help="Submission file name")
+parser.add_argument('-e', '--env', type=str, help="Environment variables to carry to worker node")
+parser.add_argument('-d', '--working_directory', type=str, help="Working directory on submission node")
+parser.add_argument('-n', '--queue_n', type=int, default=1, help="Queue n jobs for each script (i.e. queue_n*len(scripts) total jobs). $(Process) is passed as $1 to each script.")
+parser.add_argument('-o', '--transfer_output', type=str, help="Specify specific output files to transfer back")
+parser.add_argument('-t', '--time_limit', type=str, default="longlunch", help="JobFlavour option (espresso=20min, microcentury=1hr, longlunch=2hr, workday=8hr, tomorrow=1day, testmatch=3day, nextweek=1week")
+parser.add_argument('-p', '--pythonpath', action='store_true', help="Use the current PYTHONPATH")
+parser.add_argument('-O', '--os', type=str, default=None, choices=["el7", "el8", "el9"], help="Specify OS (condor submission method)")
+parser.add_argument('--internal_os', type=str, default=None, choices=["el7", "el8", "el9"], help="Specify OS (directly run singularity inside job)")
+parser.add_argument('-j', '--nThreads', type=int, default=1, help="Request multiple cores")
+parser.add_argument('--no_submit', action='store_true', help="Prepare jobs but don't submit")
+#parser.add_argument('--cmssw', action='store_true', help='Transfer CMSSW libraries as a tarball')
+#parser.add_argument('--cmssw_src', action='store_true', help='Transfer CMSSW src as a tarball, and compile on worker node')
+parser.add_argument('--no_retar', action='store_true', help='Use existing tarball')
+parser.add_argument("--x509", "-x", type=str, default=None, help="Path to x509 proxy")
+args = parser.parse_args()
+
+import socket
+hostname = socket.gethostname()
+print(f"Detected host {hostname}")
+if "cmslpc" in hostname:
+    host = "cmslpc"
+elif "lxplus" in hostname:
+    host = "lxplus"
+elif "uscms" in hostname:
+    host = "cmsconnect"
+else:
+    raise ValueError("Unknown host {}".format(hostname))
+
+if args.os and args.internal_os:
+    raise ValueError("Cannot specify --os and --internal_os")
+
+# Make list of files to transfer to worker node
+files_to_transfer = []
+script_fullpath = os.path.abspath(args.script)
+files_to_transfer.append(script_fullpath)
+
+starting_directory = os.getcwd()
+if args.working_directory:
+    os.system("mkdir -pv " + args.working_directory)
+    os.chdir(args.working_directory)
+
+#cmssw_version = os.path.expandvars("$CMSSW_VERSION")
+
+#data_directory = "/uscms/home/dryu/nobackup/"
+#data_directory = "/home/dryu/data/"
+
+#if args.cmssw_src:
+#   if not args.no_retar:
+#       make_tarball(True)
+#       #tar_command = "tar -hczf " + data_directory + "/" + cmssw_version + "_src.tar.gz -C $CMSSW_BASE/src . --exclude=*/test/crab --exclude=*/gen/crab --exclude=*/skim/crab --exclude=*/test/condor --exclude=*/.git*"
+#       #os.system(tar_command)
+#   files_to_transfer.append(get_tarball_path(True))
+
+#if args.cmssw:
+#   if not args.no_retar:
+#       make_tarball(False)
+#       #tar_command = "tar -hczf " + data_directory + "/" + cmssw_version + ".tar.gz -C $CMSSW_BASE . --exclude=*/test/crab --exclude=*/gen/crab --exclude=*/skim/crab --exclude=*/test/condor --exclude=*/.git*"
+#       #os.system(tar_command)
+#   files_to_transfer.append(get_tarball_path(False))
+
+if args.file_list:
+    file_list_txt = open(args.file_list)
+    for line in file_list_txt:
+        files_to_transfer.append(line.rstrip())
+
+if args.file_string:
+    files_to_transfer.extend(args.file_string.split(","))
+
+env_to_transfer = {}
+#if args.cmssw or args.cmssw_src:
+#   env_to_transfer["CMSSW_VERSION"] = os.path.expandvars("$CMSSW_VERSION")
+#   #env_to_transfer["PATH"] = os.path.expandvars("$PATH").replace(os.path.expandvars("$CMSSW_BASE"), "${_CONDOR_SCRATCH_DIR}/$CMSSW_VERSION")
+#   #env_to_transfer["LD_LIBRARY_PATH"] = os.path.expandvars("$LD_LIBRARY_PATH").replace(os.path.expandvars("$CMSSW_BASE"), "${_CONDOR_SCRATCH_DIR}/$CMSSW_VERSION")
+#   #env_to_transfer["PYTHONPATH"] = os.path.expandvars("$PYTHONPATH").replace(os.path.expandvars("$CMSSW_BASE"), "${_CONDOR_SCRATCH_DIR}/$CMSSW_VERSION")
+if args.env:
+    for this_env in args.env.split(","):
+        env_to_transfer[this_env] = os.path.expandvars("$" + this_env)
+if args.pythonpath:
+    env_to_transfer["PYTHONPATH"] = os.path.expandvars("$PYTHONPATH").replace(os.path.expandvars("$CMSSW_BASE"), "${_CONDOR_SCRATCH_DIR}/$CMSSW_VERSION")
+
+# Make top-level script
+top_script_name = "condor_run_" + timestamp + ".sh"
+files_to_transfer.append(os.path.abspath(top_script_name))
+top_script = open(top_script_name, 'w')
+top_script.write(f"""#!/bin/bash
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+start=`date +%s`
+export HOME=$_CONDOR_SCRATCH_DIR
+echo \"Setting HOME to $_CONDOR_SCRATCH_DIR\"
+""")
+for env_name, env_value in env_to_transfer.items():
+    top_script.write("export " + env_name + "=" + env_value + "\n")
+#if args.cmssw_src:
+#   top_script.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
+#   top_script.write("mkdir -p $CMSSW_VERSION/src\n")
+#   top_script.write("tar -xzf {} -C $CMSSW_VERSION/src\n".format(os.path.basename(get_tarball_path(True))))
+#   top_script.write("cd $CMSSW_VERSION/src\n")
+#   top_script.write("eval `scramv1 runtime -sh`\n")
+#   top_script.write("scram b -j8\n")
+#   top_script.write("cd -\n")
+#if args.cmssw:
+#   top_script.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
+#   top_script.write("mkdir -p $CMSSW_VERSION\n")
+#   top_script.write("tar -xzf {} -C $CMSSW_VERSION\n".format(os.path.basename(get_tarball_path(False))))
+#   top_script.write("ls -lrth $CMSSW_VERSION\n")
+#   top_script.write("cd $CMSSW_VERSION/src\n")
+#   top_script.write("scramv1 b ProjectRename\n")
+#   top_script.write("eval `scramv1 runtime -sh`\n")
+#   #top_script.write("scram b -j8\n")
+#   top_script.write("cd -\n")
+#   top_script.write("ls -lrth\n")
+#   #top_script.write("ls -lrth $CMSSW_VERSION/python/*/*/*\n")
+#   #top_script.write("export PYTHONPATH=${_CONDOR_SCRATCH_DIR}/$CMSSW_VERSION/python:$PYTHONPATH\n")
+
+#top_script.write("scripts=(" + " ".join([os.path.basename(x) for x in scripts]).rstrip() + ")\n")
+if args.x509:
+    x509_fullpath = os.path.abspath(os.path.expandvars(args.x509))
+    top_script.write("export X509_USER_PROXY=$(readlink -e $_CONDOR_SCRATCH_DIR/{})\n".format(os.path.basename(x509_fullpath)))
+    top_script.write("echo $X509_USER_PROXY\n")
+    top_script.write("ls -lrth $X509_USER_PROXY\n")
+    top_script.write("voms-proxy-info -all\n")
+    files_to_transfer.append(x509_fullpath)
+
+
+if args.internal_os:
+    # This is how MCM setups up containers inside jobs. Condor's built-in support is preferable.
+    top_script.write(f"""
+if [ -e \"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/{args.internal_os}:amd64\" ]; then
+  CONTAINER_NAME=\"{args.internal_os}:amd64\"
+elif [ -e \"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/{args.internal_os}:x86_64\" ]; then
+  CONTAINER_NAME=\"{args.internal_os}:x86_64\"
+else
+  echo \"Could not find amd64 or x86_64 for {args.internal_os}\"
+  exit 1
+fi
+export SINGULARITY_CACHEDIR=\"/tmp/$(whoami)/singularity\"
+singularity run  -B $(readlink -f /cvmfs) -B $(readlink -f /etc/grid-security) -B $(readlink -f /etc/pki/ca-trust) -B $(readlink -f /etc/grid-security/certificates) /cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/$CONTAINER_NAME {os.path.basename(args.script)} $1
+    """)
+
+else:
+    top_script.write(f"source {os.path.basename(args.script)} $1")
+
+top_script.write(f"""
+echo \"Job done.\"
+
+echo \"Contents of current directory:\"
+ls -lrth
+
+echo \"Contents of top directory:\"
+ls -lrth $_CONDOR_SCRATCH_DIR
+end=`date +%s`
+runtime=$((end-start))
+echo \"Run time $runtime\"
+""")
+top_script.close()
+
+# Validate input files
+bad_files = []
+for input_file in files_to_transfer:
+    if not os.path.exists(input_file):
+        bad_files.append(input_file)
+if len(bad_files) >= 1:
+    print(bad_files)
+    raise ValueError("Some input files don't exist")
+
+
+# Make submission script
+if args.submit_file:
+    submission_file_name = args.submit_file
+else:
+    submission_file_name = "condor_submit_" + timestamp + ".jdl"
+submission_file = open(submission_file_name, 'w')
+submission_file.write(f"""
+executable = {top_script_name}
+request_memory = {args.mem}
+use_x509userproxy = true
+transfer_executable = true
+notification = never
+getenv = false
+use_x509userproxy = true
+should_transfer_files = yes
+transfer_input_files={','.join(files_to_transfer)}
+when_to_transfer_output = on_exit
+""")
+
+if args.os:
+    ''' This is the old way before containers, where you could request nodes with a specific OS
+    if "cmslpc" in hostname:
+        if args.os == "SLCern6" or args.os == "sl6":
+            submission_file.write("+DesiredOS=\"SL6\"\n")
+        elif args.os == "CentOS7" or args.os == "sl7":
+            submission_file.write("+DesiredOS=\"SL7\"\n")
+    else:
+        submission_file.write("requirements = (OpSysAndVer =?= \"{}\")\n".format(args.os))
+    '''
+    if host == "cmslpc":
+        submission_file.write(f"+ApptainerImage = \"{get_os_container(args.os, host)}\"\n")
+    else:      
+        submission_file.write(f"MY.SingularityImage = \"{get_os_container(args.os, host)}\"\n")
+
+if args.nThreads:
+    submission_file.write("request_cpus = {}\n".format(args.nThreads))
+
+submission_file.write("+JobFlavour = \"{}\"\n".format(args.time_limit))
+
+if args.transfer_output:
+    submission_file.write("transfer_output_files = " + args.transfer_output + "\n")
+
+if args.log:
+    log_stdout = args.log + ".$(Cluster).$(Process).stdout"
+    log_stderr = args.log + ".$(Cluster).$(Process).stderr"
+    log_condor = args.log + ".$(Cluster).$(Process).condor"
+else:
+    log_stdout = "log_" + timestamp + "_$(Cluster).$(Process).stdout"
+    log_stderr = "log_" + timestamp + "_$(Cluster).$(Process).stderr"
+    log_condor = "log_" + timestamp + "_$(Cluster).$(Process).condor"
+
+submission_file.write(f"""
+output = {log_stdout}
+error = {log_stderr}
+log = {log_condor}
+arguments = $(Process)
+queue {args.queue_n}
+""")
+
+#submission_file.write("\nqueue " + str(args.queue_n) + "\n")
+submission_file.close()
+
+if not args.no_submit:
+    print("Submitting condor jobs...")
+    os.system("condor_submit " + submission_file_name)
+    print("done.")
+
+os.chdir(starting_directory)
