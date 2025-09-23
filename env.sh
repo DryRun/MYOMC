@@ -1,4 +1,4 @@
-export PATH=$PATH:$PWD
+export PATH=$PWD/bin:$PATH
 export PYTHONPATH=$PWD:$PYTHONPATH
 export MYOMCPATH=$PWD
 export X509_USER_PROXY=$HOME/private/x509up
