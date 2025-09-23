@@ -31,7 +31,7 @@ def getHosted(dataset, user, allow=None, block=None):
 
     warnings.filterwarnings("ignore", message=".*cryptography.*")
     from rucio.client.client import Client # pylint: disable=import-error,import-outside-toplevel
-    client = Client(auth_host="cms-rucio-auth.cern.ch")
+    client = Client(auth_host="https://cms-rucio-auth.cern.ch")
 
     # loop over blocks to avoid timeout error from too-large response
     all_blocks = list(client.list_content(scope='cms',name=dataset))
