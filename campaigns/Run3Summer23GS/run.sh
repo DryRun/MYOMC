@@ -185,7 +185,7 @@ cmsDriver.py  \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier NANOAODSIM \
     --conditions 130X_mcRun3_2022_realistic_v5 \
-    --step NANO:@BTV \
+    --step NANO \
     --scenario pp \
     --era Run3_2023 \
     --no_exec \
@@ -197,3 +197,4 @@ if [ ! -f "Run3Summer23NanoAODv12_$NAME_$JOBINDEX.root" ]; then
     echo "Run3Summer23NanoAODv12_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi
+
