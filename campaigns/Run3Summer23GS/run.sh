@@ -82,7 +82,7 @@ cd $TOPDIR
 
 #cat $CMSSW_BASE/src/Configuration/GenProduction/python/fragment.py
 
-cmsDriver.py Configuration/GenProduction/python/TOP-Run3Summer23GS-00001-fragment.py \
+cmsDriver.py Configuration/GenProduction/python/fragment.py \
     --python_filename "Run3Summer23GS_${NAME}_cfg.py" \
     --eventcontent RAWSIM \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
