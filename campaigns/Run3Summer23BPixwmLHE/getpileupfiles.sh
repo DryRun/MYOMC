@@ -5,7 +5,7 @@ if [ -z "$1" ]; then
 else
     CERNNAME=$1
 fi
-echo "[${0}] Using {CERNNAME} as username for Rucio"
+echo "[${0}] Using $CERNNAME as username for Rucio"
 
 PILEUP_DATASET="/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer23BPix_130X_mcRun3_2023_realistic_postBPix_v1-v1/PREMIX"
 

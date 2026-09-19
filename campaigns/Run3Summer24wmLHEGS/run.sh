@@ -37,9 +37,9 @@ else
 fi
 
 if [ -z "$5" ]; then
-    MAX_NTHREADS=1
+    MAX_NTHREADS=8
 else
-    MAX_NTHREADS=1
+    MAX_NTHREADS=$5
 fi
 RSEED=$((JOBINDEX * MAX_NTHREADS * 4 + 1001 + $RANDOM)) # Space out seeds; Madgraph concurrent mode adds idx(thread) to random seed. The extra *4 is a paranoia factor.
 
@@ -60,12 +60,12 @@ TOPDIR=$PWD
 export SCRAM_ARCH=el8_amd64_gcc12
 
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-if [ -r CMSSW_14_0_19/src ] ; then
-  echo release CMSSW_14_0_19 already exists
+if [ -r CMSSW_14_0_18/src ] ; then
+  echo release CMSSW_14_0_18 already exists
 else
-  scram p CMSSW CMSSW_14_0_19
+  scram p CMSSW CMSSW_14_0_18
 fi
-cd CMSSW_14_0_19/src
+cd CMSSW_14_0_18/src
 eval `scram runtime -sh`
 
 mv ../../Configuration .
@@ -125,7 +125,7 @@ cmsDriver.py  \
     --fileout "file:Run3Summer24DRPremix0_$NAME_$JOBINDEX.root" \
     --number $NEVENTS \
     --number_out $NEVENTS \
-    --pileup_input "dbs:/Neutrino_E-10_gun/RunIIISummer24PrePremix-Premixlib2024_140X_mcRun3_2024_realistic_v26-v1/PREMIX" \
+    --pileup_input "$PILEUP_FILELIST" \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \
     --mc 
@@ -136,6 +136,7 @@ if [ ! -f "Run3Summer24DRPremix0_$NAME_$JOBINDEX.root" ]; then
 fi
 
 #RECO
+cd $TOPDIR
 cmsDriver.py  \
     --era Run3_2024 \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
@@ -158,15 +159,31 @@ if [ ! -f "Run3Summer24RECO_$NAME_$JOBINDEX.root" ]; then
     return 1
 fi
 
-# MINIAOD
+export SCRAM_ARCH=el8_amd64_gcc12
+
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+if [ -r CMSSW_15_0_2/src ] ; then
+  echo release CMSSW_15_0_2 already exists
+else
+  scram p CMSSW CMSSW_15_0_2
+fi
+cd CMSSW_15_0_2/src
+eval `scram runtime -sh`
+
+mv ../../Configuration .
+scram b
+cd ../..
+
+cd $TOPDIR
+# MINIAODv6
 cmsDriver.py  \
     --era Run3_2024 \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --step PAT \
     --geometry DB:Extended \
-    --conditions 140X_mcRun3_2024_realistic_v26 \
+    --conditions 150X_mcRun3_2024_realistic_v2 \
     --datatier MINIAODSIM \
-    --eventcontent MINIAODSIM \
+    --eventcontent MINIAODSIM1 \
     --python_filename "Run3Summer24MiniAOD_${NAME}_cfg.py" \
     --filein "file:Run3Summer24RECO_$NAME_$JOBINDEX.root" \
     --fileout "file:Run3Summer24MiniAOD_$NAME_$JOBINDEX.root" \
@@ -182,25 +199,26 @@ if [ ! -f "Run3Summer24MiniAOD_$NAME_$JOBINDEX.root" ]; then
     return 1
 fi
 
-#NanoAODv12
+#NanoAODv15
+cd $TOPDIR
 cmsDriver.py  \
     --scenario pp \
     --era Run3_2024 \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --step NANO \
-    --conditions 140X_mcRun3_2024_realistic_v26 \
+    --conditions 150X_mcRun3_2024_realistic_v2 \
     --datatier NANOAODSIM \
-    --eventcontent NANOAODSIM \
-    --python_filename "Run3Summer24NanoAODv12_${NAME}_cfg.py" \
+    --eventcontent NANOAODSIM1 \
+    --python_filename "Run3Summer24NanoAODv15_${NAME}_cfg.py" \
     --filein "file:Run3Summer24MiniAOD_$NAME_$JOBINDEX.root" \
-    --fileout "file:Run3Summer24NanoAODv12_$NAME_$JOBINDEX.root" \
+    --fileout "file:Run3Summer24NanoAODv15_$NAME_$JOBINDEX.root" \
     --number $NEVENTS \
     --number_out $NEVENTS \
     --no_exec \
     --nThreads $(( $MAX_NTHREADS < 8 ? $MAX_NTHREADS : 8 )) \ \
     --mc 
-cmsRun "Run3Summer24NanoAODv12_${NAME}_cfg.py"
-if [ ! -f "Run3Summer24NanoAODv12_$NAME_$JOBINDEX.root" ]; then
-    echo "Run3Summer24NanoAODv12_$NAME_$JOBINDEX.root not found. Exiting."
+cmsRun "Run3Summer24NanoAODv15_${NAME}_cfg.py"
+if [ ! -f "Run3Summer24NanoAODv15_$NAME_$JOBINDEX.root" ]; then
+    echo "Run3Summer24NanoAODv15_$NAME_$JOBINDEX.root not found. Exiting."
     return 1
 fi

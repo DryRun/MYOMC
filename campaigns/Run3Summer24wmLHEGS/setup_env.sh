@@ -22,14 +22,17 @@ mkdir env
 cd env
 
 export SCRAM_ARCH=el8_amd64_gcc12
-
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-scram project -n "CMSSW_14_0_19" CMSSW_14_0_19
-scram p CMSSW CMSSW_14_0_19
-cd CMSSW_14_0_19/src
-eval `scram runtime -sh`
 
-mv ../../Configuration .
+scram project -n "CMSSW_14_0_18" CMSSW_14_0_18
+cd CMSSW_14_0_18/src
+eval `scram runtime -sh`
+scram b
+cd ../..
+
+scram project -n "CMSSW_15_0_2" CMSSW_15_0_2
+cd CMSSW_15_0_2/src
+eval `scram runtime -sh`
 scram b
 cd ../..
 
